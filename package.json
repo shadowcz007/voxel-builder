@@ -1,7 +1,7 @@
 {
   "name": "voxel-builder",
   "version": "3.4.1",
-  "description": "3D voxel modeling application in Babylon.js engine",
+  "description": "3D voxel modeling application built using Babylon.js engine",
   "repository": "https://github.com/nimadez/voxel-builder",
   "author": "nimadez",
   "license": "MIT",

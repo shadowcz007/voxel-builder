@@ -28,20 +28,21 @@
     
     1. Engine/RenderLoop        initialize engine and start render loop
     2. Main Scene               initialize main scene
-    3. Axis-View Scene          initialize axis view
+    3. Axis-View Scene          initialize axis-view scene
     4. Materials                initialize and setup defaultMaterial
-    5. Voxels                   create and manipulate voxels/SPS.mesh, store all voxel positions and colors
-    6. Overlays & Helpers       create, clone and dispose
+    5. Voxels                   create and manipulate voxels(SPS.mesh), store voxel positions and colors
+    6. Overlays & Helpers       create, clone and dispose guides
     7. Tools                    camera, add (+symm), remove (+symm), transform (+symm), hide, paint (+symm), pickcolor, fillcolor, hidecolor
     8. Interactions             handle mouse down, mouse move, mouse up (+touch)
     9. HDR & Rendering          create and dispose environment HDR, toggle high-quality rendering pipeline
     10. Files                   new, load (.vox), save (.vox), import voxelized (.obj) and export (.glb)     
-    11. Local Storage           using HTML5 storage for quick save and restore
-    12. Create                  create presets
-    13. Events                  control all events, the events core
-    14. Utilities: babylon      babylon and engine related utils
-    15. Utilities: html         html related utils
-    16. Startup                 load startup project
+    11. Local Storage & Memory  storage for quick store and restore, save and load memory steps
+    12. Create                  create grid and plane
+    13. Events                  the events core
+    14. Functions               standalone functions
+    15. Utilities: babylon      babylon related utils
+    16. Utilities: html         html related utils
+    17. Startup                 load startup project
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -67,7 +68,7 @@
         ul li:hover, ul li.select, ul li.toggle { background: orange; color: #222; cursor: pointer; }
         ul li.separator { background: none; height: 3px; padding: 0; cursor: default; border: none; }
         ul li.spacer { background: none; height: 3px; padding: 0; cursor: default; border: none; }
-        input[type=color] { width: 18px; height: 18px; border: none; background: #2e35414d; outline: none; border: none; border-radius: 50%; vertical-align: text-bottom; }
+        input[type=color] { width: 22px; height: 18px; border: none; background: #2e35414d; outline: none; border: none; border-radius: 50%; vertical-align: text-bottom; }
         input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type=color]::-webkit-color-swatch { border: none; border-radius: 20%; }
         input[type=color]:hover { background: white; cursor: pointer; }
@@ -76,9 +77,6 @@
         input[type=checkbox] { display: none; }
         input[type=checkbox] + .material-icons::after { content:"check_box_outline_blank"; color: #475364; }
         input[type=checkbox]:checked + .material-icons::after { content:"check_box"; color: orange; }
-        select { appearance: none; width: 18px; background-color: #2a313db7; color: #bbb; font-size: 14px; font-weight: bold; padding: 0; border: none; outline: none; }
-        select:hover { color: orange; cursor: pointer; }
-        option { font-size: 14px; font-weight: bold; color: #bbb; background-color: #252931; }
         button { width: 115px; background-color: #353f4d; color: #bbb; box-shadow: inset 1px 1px 1px #3f4a58, inset -1px -1px 1px #2f3742; border-radius: 4px; padding: 3px; font-size: 10px; border: 1px solid #161a20bd; outline: none; }
         button:hover { background-color: orange; color: #222; cursor: pointer; }
         label { color: #5c6c81; margin-right: 5px; }
@@ -86,28 +84,34 @@
         #menuH_L li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #menuH_R { background: none; right: 10px; top: 10px; z-index: 999; }
         #menuH_R li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
+        #menuH_C { background: none; width: 300px; left: 50%; margin-left: -150px; top: 14px; z-index: 999; text-align: center; }
+        #menuH_C li { display: inline-block; width: 20px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
+        #menuH_C li.selected { background-color: orange; color: #222; }
         #menuV { z-index: 1000; position: fixed; top: 0; right: 0; background: #222731f8; padding: 10px; width: 120px; height: 100%; transform: translate(200px, 0); transition: -webkit-transform 0.2s ease; overflow-y: scroll; }
         #menuV li { background: none; text-align: left; border: none; padding: 0; color: #67778d; }
         #menuV li:hover { background: none; color: orange; }
         #menuV .category { color: #464c5e; background: #1e222b; border: solid 1px #181c22; font-size: 10px; font-weight: bold; text-align: center; margin: 6px 4px 6px 0; padding: 2px; }
         #menuV .category:hover { color: #43495a; background: #1e222b; cursor: default; }
-        #toolbar_R { right: 10px; top: 80px; padding: 3px; border-radius: 5px; }
+        #toolbar_R { width: 30px; right: 10px; top: 80px; padding: 3px; border-radius: 5px; }
         #toolbar_R li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #toolbar_R li.separator { box-shadow: none; }
-        #toolbar_L { left: 10px; top: 80px; padding: 3px; border-radius: 5px; }
+        #toolbar_L { width: 30px; left: 10px; top: 80px; padding: 3px; border-radius: 5px; }
         #toolbar_L li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #toolbar_L li.separator { box-shadow: none; }
         #color_palette { left: 10px; top: 210px; padding: 3px; border-radius: 5px; }
-        #color_palette li { width: 18px; height: 5px; margin-bottom: 1px; }
+        #color_palette li { width: 22px; height: 5px; margin-bottom: 1px; }
         #color_palette li:hover { border: solid 1px orange; }
-        #hover { z-index: 1; background: none; left: 60%; top: 120px; }
+        #hover { z-index: 1; background: none; left: 70%; top: 200px; }
         #hover li { box-shadow: inset 1px 1px 1px #37414e, inset -1px -1px 1px #2f3742; }
         #hover li:nth-child(1) { cursor: move; }
         #hover li:nth-child(2) { position: absolute; top: -110%; left: 0%; }
         #hover li:nth-child(3) { position: absolute; top: 0%; left: 110%; }
         #hover li:nth-child(4) { position: absolute; top: 0%; left: -110%; }
         #hover li:nth-child(5) { position: absolute; top: 110%; left: 0%; }
-        #axisview { background: #161a203f; bottom: 5px; right: 4px; width: 68px; height: 68px; border: 1px solid #161a2096; border-radius: 50%; box-shadow: inset 1px 1px 1px #38404d, inset -1px -1px 1px #38404d; }
+        #hover select { appearance: none; width: 18px; background-color: #2a313db7; color: #bbb; font-size: 14px; font-weight: bold; padding: 0; border: none; outline: none; }
+        #hover select:hover { color: orange; cursor: pointer; }
+        #hover option { font-size: 14px; font-weight: bold; color: #bbb; background-color: #252931; }
+        #axisview { background: #161a203f; bottom: 5px; right: 6px; width: 68px; height: 68px; border: 1px solid #161a2096; border-radius: 50%; box-shadow: inset 1px 1px 1px #38404d, inset -1px -1px 1px #38404d; }
         #axisview li { border-radius: 50%; padding: 3px; color: #495363; border: 1px solid #161a2096; }
         #axisview li:nth-child(1) { position: absolute; top: -28%; right: 0%; }
         #axisview li:nth-child(2) { position: absolute; top: -36%; right: 44%; }
@@ -116,9 +120,9 @@
         #axisview li:nth-child(5) { position: absolute; top: 65%; right: 97%; }
         #loadingscreen { display: none; z-index: 1001; position: absolute; width: 100%; height: 100%; background: #000000bb; }
         #loadingscreen .spinner { position: absolute; top: 50%; left: 50%; margin-left: -50px; margin-top: -50px; border-radius: 50%; background: #252e38; border: 2px solid #344558; animation: spin 3s infinite linear; }
-        #notifier { opacity: 0; transition: opacity 0.5s; position: absolute; left: 50%; top: 10px; margin-left: -50px; padding: 3px 5px 3px 5px; background: orange; color: #111; border: dashed 1px #d18800; font-size: 10px; font-weight: bold; border-radius: 5px; }
+        #notifier { opacity: 0; transition: opacity 0.5s; position: absolute; left: 50%; top: 50%; margin-left: -50px; margin-top: -20px; padding: 3px 5px 3px 5px; background: orange; color: #111; border: dashed 1px #d18800; font-size: 10px; font-weight: bold; border-radius: 5px; }
         #notifier.fade { opacity: 1; }
-        #status { color: #ffffff30; position: absolute; bottom: 5px; left: 5px; font-size: 10px; font-weight: bold; opacity: 0.8; }
+        #status { color: #ffffff30; position: absolute; bottom: 4px; left: 5px; font-size: 10px; font-weight: bold; opacity: 0.8; }
         #status span { color: #eee; padding: 0 1px 0 1px; }
         #status i { color: #aaa; }
         ::-webkit-scrollbar { display: none; }
@@ -127,23 +131,35 @@
     </style>
 </head>
 <body>
-    <canvas onclick="document.getElementById('exit_menuV').click()"></canvas>
+    <canvas></canvas>
     <ul id="menuH_L">
         <li title="High Quality" onclick="toggleHighQuality(); toggleButton(this)"><i class="material-icons">camera</i></li>
         <li title="Fit Camera" onclick="fitCameraToMesh()"><i class="material-icons">filter_center_focus</i></li>
     </ul>
     <ul id="menuH_R">
-        <li title="Quick Load" onclick="getStorage()"><i class="material-icons">reply_all</i></li>
-        <li title="Quick Save" onclick="setStorage()"><i class="material-icons">save</i></li>
-        <li title="Main Menu" onclick="document.getElementById('show_menuV').click()"><i class="material-icons">menu</i></li>
+        <li title="Quick Restore" onclick="getStorage()"><i class="material-icons">reply_all</i></li>
+        <li title="Quick Store" onclick="setStorage()"><i class="material-icons">save</i></li>
+        <li title="Menu [SPACE]" onclick="toggleVerticalMenu()"><i class="material-icons">menu</i></li>
+    </ul>
+    <ul id="menuH_C">
+        <li onclick="loadMemory(0)" class="selected">0</li>
+        <li onclick="loadMemory(1)">1</li>
+        <li onclick="loadMemory(2)">2</li>
+        <li onclick="loadMemory(3)">3</li>
+        <li onclick="loadMemory(4)">4</li>
+        <li onclick="loadMemory(5)">5</li>
+        <li onclick="loadMemory(6)">6</li>
+        <li onclick="loadMemory(7)">7</li>
+        <li onclick="loadMemory(8)">8</li>
+        <li onclick="loadMemory(9)">9</li>
     </ul>
     <ul id="menuV">
-        <li onclick="document.getElementById('exit_menuV').click()"><i class="material-icons">exit_to_app</i></li>
+        <li onclick="toggleVerticalMenu()"><i class="material-icons">exit_to_app</i></li>
         <li class="category">FILE</li>
         <li title="New Project"><button onclick="newProject()">New</button></li>
-        <li title="Load VOX Project"><button onclick="document.getElementById('openfile_vox').click()">Load</button></li>
-        <li title="Save VOX Project"><button onclick="saveProject()">Save</button></li>
-        <li title="Import Voxelized OBJ"><button onclick="document.getElementById('openfile_obj').click()">Import</button></li>
+        <li title="Load Project"><button onclick="document.getElementById('openfile_vox').click()">Load</button></li>
+        <li title="Save Project"><button onclick="saveProject()">Save</button></li>
+        <li title="Import OBJ (voxelized)"><button onclick="document.getElementById('openfile_obj').click()">Import</button></li>
         <li title="Export GLB"><button onclick="exportMesh()">Export</button></li>
         <li class="spacer"></li>
         <li title="Higher scale capture more details"><label>Import Scale &nbsp;<input id="user-input-voxelization-scale" type="number" value="30" min="1" max="100" style="width: 40px"></label></li>
@@ -158,18 +174,18 @@
             <label>Y&nbsp;&nbsp;</label><input id="user-input-create-y" type="number" value="6" min="1" max="100"><br>
             <label>Z&nbsp;&nbsp;</label><input id="user-input-create-z" type="number" value="5" min="1" max="100"><br>
             <li class="spacer"></li>
-            <button onclick="createGrid()">Grid</button>
-            <button onclick="createRandom()">Random</button>
+            <button onclick="createGrid()" title="Create grid or plane">Grid</button>
+            <button onclick="createRandom()" title="Create randomized grid or plane">Random Grid</button>
         </li>
         <li class="category">VIEW</li>
-        <li onclick="toggleFullscreen()"><input type="checkbox" id="check_fullscreen"><i class="material-icons"></i> Fullscreen [F]</li>
+        <li onclick="toggleFullscreen()" title="Toggle Fullscreen [F]"><input type="checkbox" id="check_fullscreen"><i class="material-icons"></i> Fullscreen</li>
         <li class="spacer"></li>
-        <li onclick="toggleCameraAutoRotation()"><input type="checkbox" id="check_autorotation"><i class="material-icons"></i> Auto Rotation</li>
+        <li onclick="toggleCameraAutoRotation()" title="Auto-Rotate Scene"><input type="checkbox" id="check_autorotation"><i class="material-icons"></i> Auto Rotation</li>
         <li class="spacer"></li>
         <li><label>Light &nbsp;<input type="number" value="120" min="0" max="360" step="10" oninput="setLightPositionByAngle(scene.lights[1], this.value, 50, 100); updateShadowMap();"> °</label></li>
         <li class="category">SCENE</li>
-        <li><button onclick="optimize()">Optimize Scene</button></li>
-        <li><button onclick="toggleDebugMode()">Debug Mode</button></li>
+        <li><button onclick="optimize()" title="Optimize scene for maximum performance">Optimize Scene</button></li>
+        <li><button onclick="toggleDebugMode()" title="Toggle Babylon.js debug tools">Debug Mode</button></li>
         <li class="category">ABOUT</li>
         <li style="text-align: center; font-size: 10px;"><a href="https://github.com/nimadez/voxel-builder">GitHub Repository</a><br><a href="https://github.com/nimadez">©2019 nimadez</a></li>
     </ul>
@@ -181,8 +197,8 @@
         <li class="colorpicker" title="Color Picker" onclick="document.getElementById('inputcolor').click()"><input type="color" id="inputcolor" value="#3876C0"></li>
     </ul>
     <ul id="toolbar_R">
-        <li class="hide" title="Hide By Voxel [4]" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i></li>
-        <li class="hidecolor" title="Hide By Color [5]" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i></li>
+        <li class="hide" title="Hide Voxels [4]" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i></li>
+        <li class="hidecolor" title="Hide Voxels By Color [5]" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i></li>
         <li class="unhideall" title="Unhide All" onclick="setParticlesVisibility(true)"><i class="material-icons">restart_alt</i></li>
         <li class="freezevisibility" title="Freeze Visibility" onclick="freezeVisibility()"><i class="material-icons">ac_unit</i></li>
         <li class="separator"></li>
@@ -211,12 +227,12 @@
     </ul>
     <!-- dynamic -->
     <ul id="color_palette" title="Color Palette"></ul>
-    <div id="loadingscreen"><div class="spinner"><i class="material-icons" style="font-size: 50px; color: orange">settings</i></div></div>
+    <div id="loadingscreen"><div class="spinner"><i class="material-icons" style="font-size: 50px; color: orange">motion_photos_on</i></div></div>
     <div id="notifier"></div>
     <div id="status"><span id="fps" style="font-size: 11px">00</span> | <span id="voxels">0</span><i> voxels</i> <span id="verts">0</span><i> verts</i></div>
     <!-- hidden -->
     <div style="display: none" id="show_menuV" onclick="document.getElementById('menuV').style.transform = 'translate(0, 0)'"></div>
-    <div style="display: none" id="exit_menuV" onclick="document.getElementById('menuV').style.transform = 'translate(200px, 0)'"></div>
+    <div style="display: none" id="hide_menuV" onclick="document.getElementById('menuV').style.transform = 'translate(200px, 0)'"></div>
     <input style="display: none" type="file" id="openfile_vox" accept=".vox" onclick="this.value = null">
     <input style="display: none" type="file" id="openfile_obj" accept=".obj" onclick="this.value = null">
     <input style="display: none" type="file" id="openfile_hdr" accept=".hdr" onclick="this.value = null">
@@ -227,8 +243,11 @@
     const notifier = document.getElementById('notifier');
     const inputColor = document.getElementById('inputcolor');
     const inputSymmetry = document.getElementById("inputsymmetry");
+    const memBlocks = document.querySelectorAll('#menuH_C li');
     let currentColor = inputColor.value.toUpperCase();
     let symmetryAxis = inputSymmetry.options[inputSymmetry.selectedIndex].value;
+    let showVerticalMenu = true;
+    let memStep = 0;
 
     // -----------------------------------------------------------------------------------
     // Engine/RenderLoop -----------------------------------------------------------------
@@ -412,7 +431,6 @@
         createSPS();
         updateShadowMap();
         createPalette();
-        fitCameraToMesh();
         // reset toggles
         clearAllToggles();
         clearAllToggleButtons();
@@ -570,9 +588,10 @@
         overlayPlane.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, angle);
     }
 
-    function setWorkPlane(axis) { //axis: BABYLON.Axis.X
+    function setWorkPlane(axis, scale) { //axis: BABYLON.Axis.X
         workPlane.isVisible = true;
         workPlane.position.y = -0.5;
+        workPlane.scaling = new BABYLON.Vector3(scale, scale, scale);
         workPlane.rotation = BABYLON.Vector3.Zero();
         if (axis.x == 1) workPlane.rotation.y = Math.PI/2;
         if (axis.y == 1) workPlane.rotation.x = Math.PI/2;
@@ -791,12 +810,36 @@
         }
         clearDummyVoxels();
         selected = [];
+
+        // store memory
+        const ignoredTools = ['hide', 'hidecolor'];
+        if (!ignoredTools.includes(tool)) {
+            memStep += 1;
+            saveMemory(memStep);
+        }
     }
 
     function toolSelector(toolName, forceUnHideAll) {
         tool = toolName;
         if (forceUnHideAll) setParticlesVisibility(true);
         clearButtons(document.getElementsByClassName(toolName)[0]);
+    }
+
+    function symmetryFinder(pos, axis) {
+        pos = symmetryInverse(pos, axis);
+        for (let i in voxels) {
+            if (voxels[i].position.equals(pos)){
+                return i; // return voxel index at certain mirrored position
+            }
+        }
+        return -1;
+    }
+
+    function symmetryInverse(pos, axis) {
+        if (axis == 'x') pos = new BABYLON.Vector3(-pos.x, pos.y, pos.z);
+        if (axis == 'y') pos = new BABYLON.Vector3(pos.x, -(pos.y+1), pos.z);
+        if (axis == 'z') pos = new BABYLON.Vector3(pos.x, pos.y, -pos.z);
+        return pos;
     }
 
     // -----------------------------------------------------------------------------------
@@ -966,6 +1009,8 @@
         data.push({ position: new BABYLON.Vector3(-0.5, 0, 0.5),   color: currentColor });
         data.push({ position: new BABYLON.Vector3(0.5, 0, -0.5), color: currentColor });
         createBlock(data);
+        fitCameraToMesh();
+        clearMemory();
         data = null;
     }
 
@@ -985,6 +1030,8 @@
             }
         }
         createBlock(data);
+        fitCameraToMesh();
+        clearMemory();
         data = null;
     }
 
@@ -1000,9 +1047,9 @@
         const scale = document.getElementById('user-input-voxelization-scale').value;
         toggleLoadingScreen();
         BABYLON.SceneLoader.LoadAssetContainerAsync(url, "", scene, null, ext).then(function(container) {
-            const mesh = BABYLON.Mesh.MergeMeshes(container.meshes, true, true); // we calculate random points per surface area,
-            normalizeImportedMesh(mesh, scale);                                  // voxel is 1x1x1, so larger mesh size equals to more voxels,
-            let pointData = getRandomPointsOnMeshSurface(mesh);                  // and longer surface require more points to fill details.
+            const mesh = BABYLON.Mesh.MergeMeshes(container.meshes, true, true);
+            normalizeImportedMesh(mesh, scale);
+            let pointData = getRandomPointsOnMeshSurface(mesh);
             const bounds = mesh.getBoundingInfo();
             const center = bounds.boundingBox.centerWorld;
             const size = getMeshSize(bounds);
@@ -1021,6 +1068,9 @@
             }
 
             // voxelization
+            // we calculate random points per surface area,
+            // voxel is 1x1x1, so larger mesh size equals to more voxels,
+            // and longer surface require more points to fill details.
             let data = [];
             let unique = [];
             let distance = 0;
@@ -1035,6 +1085,8 @@
             }
             
             createBlock(data);
+            fitCameraToMesh();
+            clearMemory();
             
             data = null;
             unique = null;
@@ -1065,7 +1117,7 @@
     }
 
     // -----------------------------------------------------------------------------------
-    // Local Storage ---------------------------------------------------------------------
+    // Local Storage & Memory ------------------------------------------------------------
 
     function setStorage() {
         localStorage.setItem("voxelstorage", JSON.stringify(voxels));
@@ -1086,8 +1138,51 @@
             });
         }
         createBlock(newData);
+        clearMemory();
         data = null;
         newData = null;
+    }
+
+    function saveMemory(step) {
+        if (step > 9) step = 0;
+        if (step < 0) step = 9;
+
+        localStorage.setItem("voxelstorage"+step, JSON.stringify(voxels));
+
+        for (let i of memBlocks)
+            i.classList.remove("selected");
+        memBlocks[step].classList.add("selected");
+    }
+
+    function loadMemory(step) {
+        if (step > 9) step = 0;
+        if (step < 0) step = 9;
+
+        let data = JSON.parse(localStorage.getItem("voxelstorage"+step));
+        if (!data) return;
+        let newData = [];
+        for (let i in data) {
+            newData.push({
+                position: new BABYLON.Vector3(data[i].position._x, data[i].position._y, data[i].position._z),
+                color: data[i].color
+            });
+        }
+        createBlock(newData);
+        data = null;
+        newData = null;
+
+        for (let i of memBlocks)
+            i.classList.remove("selected");
+        memBlocks[step].classList.add("selected");
+        memStep = step;
+    }
+
+    // clear memory and initialize memory block 0
+    function clearMemory() {
+        memStep = 0;
+        for (let step=0; step<10; step++)
+            localStorage.removeItem("voxelstorage"+step);
+        saveMemory(0);
     }
 
     // -----------------------------------------------------------------------------------
@@ -1107,6 +1202,8 @@
             }
         }
         createBlock(data);
+        fitCameraToMesh();
+        clearMemory();
         data = null;
     }
 
@@ -1125,6 +1222,8 @@
             }
         }
         createBlock(data);
+        fitCameraToMesh();
+        clearMemory();
         data = null;
     }
 
@@ -1189,64 +1288,170 @@
         symmetryAxis = this.options[this.selectedIndex].value;
         this.style.color = '#bbb';
         clearWorkPlane();
+        const size = getMeshSize(SPS.mesh.getBoundingInfo());
         if (symmetryAxis == 'x') {
             this.style.color = '#C83C43';
-            setWorkPlane(BABYLON.Axis.X, '#C83C43'); //r
+            setWorkPlane(BABYLON.Axis.X, size.x/4);
         }
         if (symmetryAxis == 'y') {
             this.style.color = '#47C64B';
-            setWorkPlane(BABYLON.Axis.Y, '#47C64B'); //g
+            setWorkPlane(BABYLON.Axis.Y, size.y/4);
         }
         if (symmetryAxis == 'z') {
             this.style.color = '#6493D2';
-            setWorkPlane(BABYLON.Axis.Z, '#6493D2'); //b
+            setWorkPlane(BABYLON.Axis.Z, size.z/4);
         }
     }, false);
 
     canvas.addEventListener("keyup", function (e) {
-        switch (e.keyCode) {
-            case 87: // W
+        //console.log(e.key);
+        switch (e.key) {
+            case 'w':
                 toolSelector('add', true);
                 break;
-            case 65: // A
+            case 'a':
                 toolSelector('transform', true);
                 break;
-            case 83: // S
+            case 's':
                 toolSelector('camera', true);
                 break;
-            case 68: // D
+            case 'd':
                 toolSelector('remove', true);
                 break;
-            case 49: // 1
+            case '1':
                 toolSelector('paint', false);
                 break;
-            case 50: // 2
+            case '2':
                 toolSelector('fillcolor', false);
                 break;
-            case 51: // 3
+            case '3':
                 toolSelector('pickcolor', false);
                 break;
-            case 52: // 4
+            case '4':
                 toolSelector('hide', false);
                 break;
-            case 53: // 5
+            case '5':
                 toolSelector('hidecolor', false);
                 break;
-            case 70: // F
+            case 'f':
                 toggleFullscreen();
                 break;
         }
+        if (e.ctrlKey && e.key === 'z') {
+            let tempStep = memStep - 1;
+            if (tempStep < 0) tempStep = 9;
+            if (localStorage.getItem("voxelstorage"+tempStep)) {
+                memStep -= 1;
+                loadMemory(memStep);
+            }
+        }
+        if (e.ctrlKey && e.key === 'x') {
+            let tempStep = memStep + 1;
+            if (tempStep > 9) tempStep = 0;
+            if (localStorage.getItem("voxelstorage"+tempStep)) {
+                memStep += 1;
+                loadMemory(memStep);
+            }
+        }
     }, false);
 
-    // F5 refresh for electron
     document.addEventListener("keyup", function (e) {
+        switch (e.key) {
+            case ' ':
+                toggleVerticalMenu();
+                break;
+        }
+        // F5 refresh for electron
         if (navigator.userAgent.toLowerCase().indexOf(' electron/') > -1) {
             if (e.keyCode == 116) location.reload();
         }
     }, false);
 
+    // switch memory blocks on click
+    for (let i=0; i<memBlocks.length; i++) {
+        memBlocks[i].addEventListener("click", function() {
+            if (localStorage.getItem("voxelstorage"+i)) {  // if storage is not empty
+                for (let b of memBlocks) b.classList.remove("selected"); // unselect all
+                this.classList.add("selected");
+            } else {
+                showNotification("Empty Memory");
+            }
+        }, false);
+    }
+
     // -----------------------------------------------------------------------------------
-    // Utilities: babylon ----------------------------------------------------------------
+    // Functions -------------------------------------------------------------------------
+
+    function normalizeImportedMesh(mesh, scale) {
+        // normalize scale
+        let bounds = mesh.getBoundingInfo();
+        let size = getMeshSize(bounds);
+        const scaleFactor = Math.min(scale / size.x, scale / size.y, scale / size.z);
+        mesh.bakeTransformIntoVertices(BABYLON.Matrix.Scaling(scaleFactor, scaleFactor, scaleFactor));
+        // center mesh and drop to floor
+        bounds = mesh.getBoundingInfo();
+        size = getMeshSize(bounds);
+        const center = bounds.boundingBox.center;
+        const newX = (-bounds.maximum.x) + (size.x / 2);
+        const newY = (size.y / 2) - (center.y);
+        const newZ = (-bounds.maximum.z) + (size.z / 2);
+        mesh.bakeTransformIntoVertices(BABYLON.Matrix.Translation(newX, newY, newZ));
+    }
+
+    function normalizeVoxelPositions() {
+        const bounds = SPS.mesh.getBoundingInfo();
+        const size = getMeshSize(bounds);
+        const center = bounds.boundingBox.center;
+        const newX = (-bounds.maximum.x) + (size.x / 2);
+        const newY = ((size.y / 2) - center.y) - 0.5;
+        const newZ = (-bounds.maximum.z) + (size.z / 2);
+        let pos = null;
+        let mat = null;
+        for (let i in voxels) {
+            mat = BABYLON.Matrix.Translation(newX, newY, newZ);
+            pos = BABYLON.Vector3.TransformCoordinates(voxels[i].position, mat);
+            setVoxelPosition(i, pos);
+        }
+        updateSPS();
+
+        // store memory
+        memStep += 1;
+        saveMemory(memStep);
+    }
+
+    function freezeVisibility() {
+        if (!confirm("This operation is not undoable, continue?")) return;
+        for (let i in SPS.particles) {
+            if (!SPS.particles[i].isVisible) {
+                removeVoxel(SPS.particles[i].position);
+            }
+        }
+        createSPS();
+        createPalette();
+
+        // store memory
+        memStep += 1;
+        saveMemory(memStep);
+    }
+
+    function setParticlesVisibility(isVisible) {
+        for (let i in SPS.particles)
+            SPS.particles[i].isVisible = isVisible;
+        updateSPS();
+    }
+
+    function fitCameraToMesh() {
+        const bounds = SPS.mesh.getBoundingInfo().boundingSphere;
+        const radius = bounds.radiusWorld;
+        scene.activeCamera.setPosition(new BABYLON.Vector3(radius * 4, radius * 4, radius * 4));
+        scene.activeCamera.setTarget(bounds.center.clone());
+    }
+
+    function toggleCameraAutoRotation() {
+        scene.activeCamera.idleRotationWaitTime = 0;
+        scene.activeCamera.useAutoRotationBehavior = !scene.activeCamera.useAutoRotationBehavior;
+        document.getElementById('check_autorotation').checked = scene.activeCamera.useAutoRotationBehavior;
+    }
 
     function clearAllToggles() {
         scene.getNodeByName("grid").isVisible = true;           //toggleGrid
@@ -1293,11 +1498,8 @@
         SPS.mesh.showBoundingBox = !SPS.mesh.showBoundingBox;
     }
 
-    function setParticlesVisibility(isVisible) {
-        for (let i in SPS.particles)
-            SPS.particles[i].isVisible = isVisible;
-        updateSPS();
-    }
+    // -----------------------------------------------------------------------------------
+    // Utilities: babylon ----------------------------------------------------------------
 
     function setLightPositionByAngle(light, angle, distance, height) {
         const x = Math.cos(angle * Math.PI / 180) * distance;
@@ -1312,67 +1514,10 @@
         scene.lights[1].getShadowGenerator().getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
     }
 
-    function fitCameraToMesh() {
-        const bounds = SPS.mesh.getBoundingInfo().boundingSphere;
-        const radius = bounds.radiusWorld;
-        scene.activeCamera.setPosition(new BABYLON.Vector3(radius * 4, radius * 4, radius * 4));
-        scene.activeCamera.setTarget(bounds.center.clone());
-    }
-
-    function toggleCameraAutoRotation() {
-        scene.activeCamera.idleRotationWaitTime = 0;
-        scene.activeCamera.useAutoRotationBehavior = !scene.activeCamera.useAutoRotationBehavior;
-        document.getElementById('check_autorotation').checked = scene.activeCamera.useAutoRotationBehavior;
-    }
-
     function updateViewport(w, h, bottom, right) {
         const width = canvas.width;
         const height = canvas.height;
         return new BABYLON.Viewport(1 - (w + right) / width, 1 - (bottom + height) / height,   w / width, h / height);
-    }
-
-    function normalizeImportedMesh(mesh, scale) {
-        // normalize scale
-        let bounds = mesh.getBoundingInfo();
-        let size = getMeshSize(bounds);
-        const scaleFactor = Math.min(scale / size.x, scale / size.y, scale / size.z);
-        mesh.bakeTransformIntoVertices(BABYLON.Matrix.Scaling(scaleFactor, scaleFactor, scaleFactor));
-        // center mesh and drop to floor
-        bounds = mesh.getBoundingInfo();
-        size = getMeshSize(bounds);
-        const center = bounds.boundingBox.center;
-        const newX = (-bounds.maximum.x) + (size.x / 2);
-        const newY = (size.y / 2) - (center.y);
-        const newZ = (-bounds.maximum.z) + (size.z / 2);
-        mesh.bakeTransformIntoVertices(BABYLON.Matrix.Translation(newX, newY, newZ));
-    }
-
-    function normalizeVoxelPositions() {
-        const bounds = SPS.mesh.getBoundingInfo();
-        const size = getMeshSize(bounds);
-        const center = bounds.boundingBox.center;
-        const newX = (-bounds.maximum.x) + (size.x / 2);
-        const newY = ((size.y / 2) - center.y) - 0.5;
-        const newZ = (-bounds.maximum.z) + (size.z / 2);
-        let pos = null;
-        let mat = null;
-        for (let i in voxels) {
-            mat = BABYLON.Matrix.Translation(newX, newY, newZ);
-            pos = BABYLON.Vector3.TransformCoordinates(voxels[i].position, mat);
-            setVoxelPosition(i, pos);
-        }
-        updateSPS();
-    }
-
-    function freezeVisibility() {
-        if (!confirm("This operation is not undoable, continue?")) return;
-        for (let i in SPS.particles) {
-            if (!SPS.particles[i].isVisible) {
-                removeVoxel(SPS.particles[i].position);
-            }
-        }
-        createSPS();
-        createPalette();
     }
 
     function getMeshSize(bounds) {
@@ -1381,23 +1526,6 @@
         size.y = Math.abs(bounds.minimum.y - bounds.maximum.y);
         size.z = Math.abs(bounds.minimum.z - bounds.maximum.z);
         return size;
-    }
-
-    function symmetryFinder(pos, axis) {
-        pos = symmetryInverse(pos, axis);
-        for (let i in voxels) {
-            if (voxels[i].position.equals(pos)){
-                return i; // return voxel index at certain mirrored position
-            }
-        }
-        return -1;
-    }
-
-    function symmetryInverse(pos, axis) {
-        if (axis == 'x') pos = new BABYLON.Vector3(-pos.x, pos.y, pos.z);
-        if (axis == 'y') pos = new BABYLON.Vector3(pos.x, -(pos.y+1), pos.z);
-        if (axis == 'z') pos = new BABYLON.Vector3(pos.x, pos.y, -pos.z);
-        return pos;
     }
 
     function getRandomPointsOnMeshSurface(mesh) {
@@ -1506,9 +1634,8 @@
     }
 
     function updateStatus() {
-        const verts = SPS.mesh.getTotalVertices();
         document.getElementById('voxels').innerHTML = voxels.length;
-        document.getElementById('verts').innerHTML = verts;
+        document.getElementById('verts').innerHTML = SPS.mesh.getTotalVertices();
     }
 
     // dynamically create color(li) inside palette(ul)
@@ -1537,6 +1664,15 @@
             notifier.classList.toggle('fade');
             clearTimeout(t);
         }, 3000);
+    }
+
+    function toggleVerticalMenu() {
+        showVerticalMenu = !showVerticalMenu;
+        if (showVerticalMenu) {
+            document.getElementById('hide_menuV').click();
+        } else {
+            document.getElementById('show_menuV').click();
+        }
     }
 
     function toggleLoadingScreen() {
