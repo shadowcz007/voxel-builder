@@ -36,29 +36,32 @@
     8. Interactions             handle mouse down, mouse move, mouse up (+touch)
     9. HDR & Rendering          create and dispose environment HDR, toggle high-quality rendering pipeline
     10. Files                   new, load (.vox), save (.vox), import voxelized (.obj) and export (.glb)     
-    11. Local Storage & Memory  storage for quick store and restore, save and load memory steps
+    11. Storage & Memory        storage for quick save and restore, save and load memory steps
     12. Create                  create grid and plane
     13. Events                  the events core
     14. Functions               standalone functions
     15. Utilities: babylon      babylon related utils
     16. Utilities: html         html related utils
-    17. Startup                 load startup project
+    17. Instruction & Tips      show help, instructions, tips
+    18. Startup                 load startup project
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="A voxel-based modeling application built using Babylon.js engine, optimized for maximum performance and minimum dependencies">
+    <meta name="author" content="@nimadez">
     <title>Voxel Builder</title>
-    <link rel="icon" href="data:image/png;base64,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">
+    <link rel="icon" href="data:image/png;base64,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">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
-    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-    <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/BabylonJS/Babylon.js@master/dist/babylon.js"></script>                                    <!-- <script src="https://cdn.babylonjs.com/babylon.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/gh/BabylonJS/Babylon.js@master/dist/materialsLibrary/babylonjs.materials.min.js"></script>   <!-- <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/gh/BabylonJS/Babylon.js@master/dist/loaders/babylonjs.loaders.min.js"></script>              <!-- <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/gh/BabylonJS/Babylon.js@master/dist/serializers/babylonjs.serializers.min.js"></script>      <!-- <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script> -->
     <style>
         * { margin: 0; padding: 0; }
-        html, body { overscroll-behavior-y: contain; user-select: none; } /* prevent pull-down refresh and text selection on chrome mobile */
+        html, body { overscroll-behavior-y: contain; user-select: none; overflow: hidden; } /* prevent pull-down refresh and text selection on chrome mobile */
         body { font-family: sans-serif; font-size: 11px; color: #cccccc; cursor: default; }
         a { color: slategray; text-decoration: none; }
         a:hover { color: orange; text-decoration: none; }
@@ -68,7 +71,7 @@
         ul li:hover, ul li.select, ul li.toggle { background: orange; color: #222; cursor: pointer; }
         ul li.separator { background: none; height: 3px; padding: 0; cursor: default; border: none; }
         ul li.spacer { background: none; height: 3px; padding: 0; cursor: default; border: none; }
-        input[type=color] { width: 22px; height: 18px; border: none; background: #2e35414d; outline: none; border: none; border-radius: 50%; vertical-align: text-bottom; }
+        input[type=color] { width: 20px; height: 18px; border: none; background: #2e35414d; outline: none; border: none; border-radius: 50%; vertical-align: text-bottom; }
         input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type=color]::-webkit-color-swatch { border: none; border-radius: 20%; }
         input[type=color]:hover { background: white; cursor: pointer; }
@@ -77,14 +80,14 @@
         input[type=checkbox] { display: none; }
         input[type=checkbox] + .material-icons::after { content:"check_box_outline_blank"; color: #475364; }
         input[type=checkbox]:checked + .material-icons::after { content:"check_box"; color: orange; }
-        button { width: 115px; background-color: #353f4d; color: #bbb; box-shadow: inset 1px 1px 1px #3f4a58, inset -1px -1px 1px #2f3742; border-radius: 4px; padding: 3px; font-size: 10px; border: 1px solid #161a20bd; outline: none; }
+        button { width: 115px; background-color: #353f4d; color: #bbb; box-shadow: inset 1px 1px 1px #3f4a58, inset -1px -1px 1px #2f3742; border-radius: 4px; padding: 3px; font-size: 11px; border: 1px solid #161a20bd; outline: none; }
         button:hover { background-color: orange; color: #222; cursor: pointer; }
-        label { color: #5c6c81; margin-right: 5px; }
-        #menuH_L { background: none; left: 10px; top: 10px; }
+        label { color: #5c6c81; margin-right: 2px; margin-left: 2px; }
+        #menuH_L { background: none; left: 5px; top: 5px; }
         #menuH_L li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #menuH_R { background: none; right: 10px; top: 10px; z-index: 999; }
+        #menuH_R { background: none; right: 5px; top: 5px; z-index: 999; }
         #menuH_R li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #menuH_C { background: none; width: 300px; left: 50%; margin-left: -150px; top: 14px; z-index: 999; text-align: center; }
+        #menuH_C { background: none; width: 300px; left: 50%; margin-left: -150px; top: 8px; z-index: 999; text-align: center; }
         #menuH_C li { display: inline-block; width: 20px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #menuH_C li.selected { background-color: orange; color: #222; }
         #menuV { z-index: 1000; position: fixed; top: 0; right: 0; background: #222731f8; padding: 10px; width: 120px; height: 100%; transform: translate(200px, 0); transition: -webkit-transform 0.2s ease; overflow-y: scroll; }
@@ -92,26 +95,26 @@
         #menuV li:hover { background: none; color: orange; }
         #menuV .category { color: #464c5e; background: #1e222b; border: solid 1px #181c22; font-size: 10px; font-weight: bold; text-align: center; margin: 6px 4px 6px 0; padding: 2px; }
         #menuV .category:hover { color: #43495a; background: #1e222b; cursor: default; }
-        #toolbar_R { width: 30px; right: 10px; top: 80px; padding: 3px; border-radius: 5px; }
+        #toolbar_R { width: 28px; right: 5px; top: 60px; padding: 3px; border-radius: 5px; }
         #toolbar_R li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #toolbar_R li.separator { box-shadow: none; }
-        #toolbar_L { width: 30px; left: 10px; top: 80px; padding: 3px; border-radius: 5px; }
+        #toolbar_R li.separator { height: 1px; background: #525861; margin-top: 4px; margin-bottom: 4px; box-shadow: none; }
+        #toolbar_L { width: 28px; left: 5px; top: 60px; padding: 3px; border-radius: 5px; }
         #toolbar_L li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #toolbar_L li.separator { box-shadow: none; }
-        #color_palette { left: 10px; top: 210px; padding: 3px; border-radius: 5px; }
-        #color_palette li { width: 22px; height: 5px; margin-bottom: 1px; }
+        #toolbar_L li.separator { height: 1px; background: #525861; margin-top: 4px; margin-bottom: 4px; box-shadow: none; }
+        #color_palette { left: 5px; top: 225px; padding: 3px; border-radius: 5px; }
+        #color_palette li { width: 20px; height: 5px; margin-bottom: 1px; }
         #color_palette li:hover { border: solid 1px orange; }
-        #hover { z-index: 1; background: none; left: 70%; top: 200px; }
+        #hover { z-index: 1; background: none; left: 60%; top: 20%; }
         #hover li { box-shadow: inset 1px 1px 1px #37414e, inset -1px -1px 1px #2f3742; }
         #hover li:nth-child(1) { cursor: move; }
         #hover li:nth-child(2) { position: absolute; top: -110%; left: 0%; }
-        #hover li:nth-child(3) { position: absolute; top: 0%; left: 110%; }
+        #hover li:nth-child(3) { position: absolute; top: 0%; left: 108%; }
         #hover li:nth-child(4) { position: absolute; top: 0%; left: -110%; }
-        #hover li:nth-child(5) { position: absolute; top: 110%; left: 0%; }
+        #hover li:nth-child(5) { position: absolute; top: 108%; left: 0%; }
         #hover select { appearance: none; width: 18px; background-color: #2a313db7; color: #bbb; font-size: 14px; font-weight: bold; padding: 0; border: none; outline: none; }
         #hover select:hover { color: orange; cursor: pointer; }
         #hover option { font-size: 14px; font-weight: bold; color: #bbb; background-color: #252931; }
-        #axisview { background: #161a203f; bottom: 5px; right: 6px; width: 68px; height: 68px; border: 1px solid #161a2096; border-radius: 50%; box-shadow: inset 1px 1px 1px #38404d, inset -1px -1px 1px #38404d; }
+        #axisview { background: #161a203f; bottom: 5px; right: 5px; width: 68px; height: 68px; border: 1px solid #161a2096; border-radius: 50%; box-shadow: inset 1px 1px 1px #38404d, inset -1px -1px 1px #38404d; }
         #axisview li { border-radius: 50%; padding: 3px; color: #495363; border: 1px solid #161a2096; }
         #axisview li:nth-child(1) { position: absolute; top: -28%; right: 0%; }
         #axisview li:nth-child(2) { position: absolute; top: -36%; right: 44%; }
@@ -125,21 +128,24 @@
         #status { color: #ffffff30; position: absolute; bottom: 4px; left: 5px; font-size: 10px; font-weight: bold; opacity: 0.8; }
         #status span { color: #eee; padding: 0 1px 0 1px; }
         #status i { color: #aaa; }
+        #help { background: #21262e; padding: 8px; border-radius: 5px; position: absolute; width: 300px; height: auto; left: 50%; bottom: 5px; margin-left: -160px; transition: 0.5s; overflow: hidden; cursor: help; }
+        #help .tip { color: #bbb; font-size: 12px; line-height: 1.3em; }
+        #help .tip b { color: orange; }
+        #helpbtn { display: none; color: #b4cadb; width: 20px; height: 20px; text-align: center; text-shadow: 1px 1px #000; position: absolute; left: 50%; bottom: 10px; margin-left: -10px; }
+        #helpbtn button { width: 30px; }
+        .tooltip { display: none; }
+        .material-icons { font-size: 18px; pointer-events: none; vertical-align: middle; text-align: center; }
         ::-webkit-scrollbar { display: none; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .material-icons { font-size: 18px; pointer-events: none; vertical-align: middle; text-align: center; }
     </style>
 </head>
 <body>
     <canvas></canvas>
     <ul id="menuH_L">
-        <li title="High Quality" onclick="toggleHighQuality(); toggleButton(this)"><i class="material-icons">camera</i></li>
-        <li title="Fit Camera" onclick="fitCameraToMesh()"><i class="material-icons">filter_center_focus</i></li>
+        <li title="High Quality Render" onclick="toggleHighQuality(); toggleButton(this)"><i class="material-icons">camera</i><i class="tooltip"><b>High Quality Render</b><br>Toggle high-quality render mode, Try loading HDR map for better look and more realistic shading.<br>(warning: not optimized for mobile devices)</i></li>
     </ul>
     <ul id="menuH_R">
-        <li title="Quick Restore" onclick="getStorage()"><i class="material-icons">reply_all</i></li>
-        <li title="Quick Store" onclick="setStorage()"><i class="material-icons">save</i></li>
-        <li title="Menu [SPACE]" onclick="toggleVerticalMenu()"><i class="material-icons">menu</i></li>
+        <li title="Main Menu [space]" onclick="toggleVerticalMenu()"><i class="material-icons">menu</i><i class="tooltip"><b>Main Menu</b><br>Open menu to access files, views and user preferences<br>Shortcut [space]</i></li>
     </ul>
     <ul id="menuH_C">
         <li onclick="loadMemory(0)" class="selected">0</li>
@@ -152,84 +158,92 @@
         <li onclick="loadMemory(7)">7</li>
         <li onclick="loadMemory(8)">8</li>
         <li onclick="loadMemory(9)">9</li>
+        <i class="tooltip"><b>Memory Steps</b><br>Record 10 steps in local memory, click on each step to revert changes, memory cleared on loading new model<br>Shortcuts: [CTRL+Z] Previous, [CTRL+X] Next</i>
     </ul>
     <ul id="menuV">
         <li onclick="toggleVerticalMenu()"><i class="material-icons">exit_to_app</i></li>
         <li class="category">FILE</li>
-        <li title="New Project"><button onclick="newProject()">New</button></li>
-        <li title="Load Project"><button onclick="document.getElementById('openfile_vox').click()">Load</button></li>
-        <li title="Save Project"><button onclick="saveProject()">Save</button></li>
-        <li title="Import OBJ (voxelized)"><button onclick="document.getElementById('openfile_obj').click()">Import</button></li>
-        <li title="Export GLB"><button onclick="exportMesh()">Export</button></li>
+        <li title="New Project"><button onclick="newProject()">New</button><i class="tooltip"><b>New Project</b><br>Reset scene and load a new project<br>Shortcut: [none]</i></li>
+        <li title="Load Project"><button onclick="document.getElementById('openfile_vox').click()">Load</button><i class="tooltip"><b>Load Project</b><br>Reset scene and load project from a file<br>Shortcut: [none]</i></li>
+        <li title="Save Project"><button onclick="saveProject()">Save</button><i class="tooltip"><b>Save Project</b><br>Save project to file, user-perferences not included<br>Shortcut: [none]</i></li>
+        <li title="Import OBJ"><button onclick="document.getElementById('openfile_obj').click()">Import</button><i class="tooltip"><b>Import OBJ</b><br>Import model, merge and voxelize meshes.<br>Use "Import Scale" to change voxelization quality, higher scale capture more details.<br>Shortcut: [none]</i></li>
+        <li title="Export GLB"><button onclick="exportMesh()">Export</button><i class="tooltip"><b>Export GLB</b><br>Export model to GLB, include colors and grid texture, try Blender to import GLB<br>Shortcut: [none]</i></li>
         <li class="spacer"></li>
-        <li title="Higher scale capture more details"><label>Import Scale &nbsp;<input id="user-input-voxelization-scale" type="number" value="30" min="1" max="100" style="width: 40px"></label></li>
+        <li title="Higher scale capture more details"><label>Import Scale &nbsp;<input id="user-input-voxelization-scale" type="number" value="30" min="1" max="100" style="width: 38px"></label></li>
         <li class="category">HDRI</li>
-        <li title="Load Environment"><button onclick="document.getElementById('openfile_hdr').click()">Load</button></li>
-        <li title="Remove Environment"><button onclick="removeHDR()">Remove</button></li>
+        <li title="Load Environment"><button onclick="document.getElementById('openfile_hdr').click()">Load</button><i class="tooltip"><b>Load Environment</b><br>Load HDRI map for lighting and background<br>Shortcut: [none]</i></li>
+        <li title="Remove Environment"><button onclick="removeHDR()">Remove</button><i class="tooltip"><b>Remove Environment</b><br>Unload and remove HDRI map<br>Shortcut: [none]</i></li>
         <li class="spacer"></li>
-        <li title="Show Skybox" onclick="toggleSkybox()"><input type="checkbox" id="check_skybox"><i class="material-icons"></i> Background</li>
+        <li title="Show Skybox" onclick="toggleSkybox()"><input type="checkbox" id="check_skybox"><i class="material-icons"></i> Background <i class="tooltip"><b>Show Skybox</b><br>Toggle skybox/background visibility<br>Shortcut: [none]</i></li>
         <li class="category">CREATE</li>
         <li>
             <label>X&nbsp;&nbsp;</label><input id="user-input-create-x" type="number" value="5" min="1" max="100"><br>
             <label>Y&nbsp;&nbsp;</label><input id="user-input-create-y" type="number" value="6" min="1" max="100"><br>
             <label>Z&nbsp;&nbsp;</label><input id="user-input-create-z" type="number" value="5" min="1" max="100"><br>
             <li class="spacer"></li>
-            <button onclick="createGrid()" title="Create grid or plane">Grid</button>
-            <button onclick="createRandom()" title="Create randomized grid or plane">Random Grid</button>
+            <button title="Create Grid or Plane" onclick="createGrid()">Grid / Plane<i class="tooltip"><b>Create Grid</b><br>Create grid or plane, use X/Y/Z to define number of voxels, set Y to 1 to create a plane<br>Shortcut: [none]</i></button>
         </li>
         <li class="category">VIEW</li>
-        <li onclick="toggleFullscreen()" title="Toggle Fullscreen [F]"><input type="checkbox" id="check_fullscreen"><i class="material-icons"></i> Fullscreen</li>
+        <li title="Toggle Fullscreen [F]" onclick="toggleFullscreen()"><input type="checkbox" id="check_fullscreen"><i class="material-icons"></i> Fullscreen <i class="tooltip"><b>Toggle Fullscreen</b><br>Enable/disable fullscreen<br>Shortcut: [F]</i></li>
         <li class="spacer"></li>
-        <li onclick="toggleCameraAutoRotation()" title="Auto-Rotate Scene"><input type="checkbox" id="check_autorotation"><i class="material-icons"></i> Auto Rotation</li>
+        <li title="Toggle Auto Rotation" onclick="toggleCameraAutoRotation()"><input type="checkbox" id="check_autorotation"><i class="material-icons"></i> Auto Rotation <i class="tooltip"><b>Toggle Auto Rotation</b><br>Enable/disable camera auto-rotation<br>Shortcut: [none]</i></li>
         <li class="spacer"></li>
-        <li><label>Light &nbsp;<input type="number" value="120" min="0" max="360" step="10" oninput="setLightPositionByAngle(scene.lights[1], this.value, 50, 100); updateShadowMap();"> °</label></li>
+        <li><label>Light &nbsp;<input title="Light Position" type="number" value="120" min="0" max="360" step="10" oninput="setLightPositionByAngle(scene.lights[1], this.value, 50, 100); updateShadowMap();"> °</label><i class="tooltip"><b>Light Position</b><br>Set light position by angle<br>Shortcut: [none]</i></li>
         <li class="category">SCENE</li>
-        <li><button onclick="optimize()" title="Optimize scene for maximum performance">Optimize Scene</button></li>
-        <li><button onclick="toggleDebugMode()" title="Toggle Babylon.js debug tools">Debug Mode</button></li>
+        <li><button title="Optimize Scene" onclick="optimize()">Optimize Scene</button><i class="tooltip"><b>Optimize Scene</b><br>Optimize scene for maximum performance<br>Shortcut: [none]</i></li>
+        <li><button title="Toggle Debug Tools" onclick="toggleDebugMode()">Debug Mode</button><i class="tooltip"><b>Toggle Debug Tools</b><br>Show/hide Babylon.js debug layer<br>Shortcut: [none]</i></li>
         <li class="category">ABOUT</li>
-        <li style="text-align: center; font-size: 10px;"><a href="https://github.com/nimadez/voxel-builder">GitHub Repository</a><br><a href="https://github.com/nimadez">©2019 nimadez</a></li>
+        <li style="text-align: center; font-size: 10px;"><a href="https://github.com/nimadez/voxel-builder">Fork me on GitHub</a><br><a href="https://nimadez.github.io/">©2019 nimadez</a></li>
     </ul>
     <ul id="toolbar_L">
-        <li class="paint" title="Paint Color [1]" onclick="toolSelector('paint', false)"><i class="material-icons">brush</i></li>
-        <li class="fillcolor" title="Fill Color [2]" onclick="toolSelector('fillcolor', false)"><i class="material-icons">format_paint</i></li>
+        <li title="Fit Camera [H]" onclick="fitCameraToMesh()"><i class="material-icons">filter_center_focus</i><i class="tooltip"><b>Fit Camera</b><br>Reset camera and fit to model<br>Shortcut [H]</i></li>
         <li class="separator"></li>
-        <li class="pickcolor" title="Pick Color [3]" onclick="toolSelector('pickcolor', false)"><i class="material-icons">colorize</i></li>
-        <li class="colorpicker" title="Color Picker" onclick="document.getElementById('inputcolor').click()"><input type="color" id="inputcolor" value="#3876C0"></li>
+        <li title="Paint Color [Q]" class="paint" onclick="toolSelector('paint', false)"><i class="material-icons">brush</i><i class="tooltip"><b>Paint Color</b><br>Paint selected color (undoable)<br>Shortcut: [Q]</i></li>
+        <li title="Fill Color [I]" class="fillcolor" onclick="toolSelector('fillcolor', false)"><i class="material-icons">format_paint</i><i class="tooltip"><b>Fill Color</b><br>Fill and replace all similar colors<br>Shortcut: [I]</i></li>
+        <li class="separator"></li>
+        <li title="Pick Color [E]" class="pickcolor" onclick="toolSelector('pickcolor', false)"><i class="material-icons">colorize</i><i class="tooltip"><b>Pick Color</b><br>Pick voxel color, color palette created on the fly<br>Shortcut: [E]</i></li>
+        <li title="Color Picker" class="colorpicker" onclick="document.getElementById('inputcolor').click()"><input type="color" id="inputcolor" value="#3876C0"><i class="tooltip"><b>Color Picker</b><br>Pick a color, color palette created on the fly<br>Shortcut: [none]</i></li>
     </ul>
     <ul id="toolbar_R">
-        <li class="hide" title="Hide Voxels [4]" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i></li>
-        <li class="hidecolor" title="Hide Voxels By Color [5]" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i></li>
-        <li class="unhideall" title="Unhide All" onclick="setParticlesVisibility(true)"><i class="material-icons">restart_alt</i></li>
-        <li class="freezevisibility" title="Freeze Visibility" onclick="freezeVisibility()"><i class="material-icons">ac_unit</i></li>
+        <li title="Quick Restore" onclick="getStorage()"><i class="material-icons">restore</i><i class="tooltip"><b>Quick Restore</b><br>Restore model from local storage, It is persistent as long as the user chooses to refresh the page.<br>Shortcut [none]</i></li>
+        <li title="Quick Save" onclick="setStorage()"><i class="material-icons">save</i><i class="tooltip"><b>Quick Save</b><br>Save model to local storage, It is persistent as long as the user chooses to refresh the page.<br>Shortcut [none]</i></li>
         <li class="separator"></li>
-        <li class="normalize" title="Normalize Position" onclick="normalizeVoxelPositions()"><i class="material-icons">equalizer</i></li>
-    </ul>
-    <ul id="axisview">
-        <li title="Grid Texture" onclick="toggleShowGridTexture(); toggleButton(this)"><i class="material-icons" style="font-size:14px">grain</i></li>
-        <li title="Bounding Box" onclick="toggleBoundingBox(); toggleButton(this)""><i class="material-icons" style="font-size:14px">select_all</i></li>
-        <li title="Wireframe" onclick="toggleShowWireframe(); toggleButton(this)"><i class="material-icons" style="font-size:14px">flip</i></li>
-        <li title="Shadow Catcher" onclick="toggleShadowCatcher(); toggleButton(this)"><i class="material-icons" style="font-size:14px">brightness_6</i></li>
-        <li title="Grid" onclick="toggleGrid(); toggleButton(this)"><i class="material-icons"  style="font-size:14px">remove</i></li>
+        <li title="Hide Voxels [O]" class="hide" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i><i class="tooltip"><b>Hide Voxels</b><br>Hide selected voxels, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [O]</i></li>
+        <li title="Hide Voxels By Color [P]" class="hidecolor" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i><i class="tooltip"><b>Hide Voxels By Color</b><br>Hide voxels by color, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [P]</i></li>
+        <li title="Unhide All" class="unhideall" onclick="setParticlesVisibility(true)"><i class="material-icons">restart_alt</i><i class="tooltip"><b>Unhide All</b><br>Show all voxels, ignore changes and reset visibility<br>Shortcut: [none]</i></li>
+        <li title="Freeze Visibility" class="freezevisibility" onclick="freezeVisibility()"><i class="material-icons">ac_unit</i><i class="tooltip"><b>Freeze Visibility</b><br>Remove all hidden voxels (undoable)<br>Shortcut: [none]</i></li>
+        <li class="separator"></li>
+        <li title="Normalize Position" class="normalize" onclick="normalizeVoxelPositions()"><i class="material-icons">equalizer</i><i class="tooltip"><b>Normalize Position</b><br>Move to center and drop to ground (undoable)<br>Shortcut: [none]</i></li>
     </ul>
     <ul id="hover">
-        <li class="camera" title="Free Camera [S]" onclick="toolSelector('camera', false)" onpointerdown="dragElement(this)"><i class="material-icons">control_camera</i></li>
-        <li class="add" title="Add [W]" onclick="toolSelector('add', true)"><i class="material-icons">create</i></li>
-        <li class="remove" title="Remove [D]" onclick="toolSelector('remove', true)"><i class="material-icons">clear</i></li>
-        <li class="transform" title="Transform [A]" onclick="toolSelector('transform', true)"><i class="material-icons">border_inner</i></li>
-        <li class="symmetry" title="Symmetry for Add, Remove, Transform, Paint Color">
+        <li title="Free Camera [S]" class="camera" onclick="toolSelector('camera', false)" onpointerdown="dragElement(this)"><i class="material-icons">control_camera</i><i class="tooltip"><b>Free Camera</b><br>Switch to camera mode and disable tools<br>Shortcut: [S]</i></li>
+        <li title="Add [W]" class="add" onclick="toolSelector('add', true)"><i class="material-icons">create</i><i class="tooltip"><b>Add</b><br>Add new voxels, support undo and symmetry<br>Shortcut: [W]</i></li>
+        <li title="Remove [D]" class="remove" onclick="toolSelector('remove', true)"><i class="material-icons">clear</i><i class="tooltip"><b>Remove</b><br>Remove voxels, support undo and symmetry<br>Shortcut: [D]</i></li>
+        <li title="Transform [A]" class="transform" onclick="toolSelector('transform', true)"><i class="material-icons">border_inner</i><i class="tooltip"><b>Transform</b><br>Translate in selected axis, support undo and symmetry<br>Shortcut: [A]</i></li>
+        <li title="Symmetry Draw and Paint" class="symmetry">
             <select id="inputsymmetry">
                 <option style="color: #444;" value="" selected="selected">&nbsp;S</option>
                 <option style="color: #C83C43;" value="x">&nbsp;X</option>
                 <option style="color: #47C64B;" value="y">&nbsp;Y</option>
                 <option style="color: #6493D2;" value="z">&nbsp;Z</option>
             </select>
+            <i class="tooltip"><b>Symmetric Draw and Paint</b><br>Select axis to show indicator<br>Support Add, Remove, Transform and Paint Color<br>Shortcut: [none]</i>
         </li>
+    </ul>
+    <ul id="axisview">
+        <li title="Grid Texture" onclick="toggleShowGridTexture(); toggleButton(this)"><i class="material-icons" style="font-size:14px">grain</i><i class="tooltip"><b>Toggle Grid Texture</b><br>Enable/disable grid texture visibility<br>Shortcut: [none]</i></li>
+        <li title="Bounding Box" onclick="toggleBoundingBox(); toggleButton(this)""><i class="material-icons" style="font-size:14px">select_all</i><i class="tooltip"><b>Toggle Bounding Box</b><br>Enable/disable bounding box visibility<br>Shortcut: [none]</i></li>
+        <li title="Wireframe" onclick="toggleShowWireframe(); toggleButton(this)"><i class="material-icons" style="font-size:14px">flip</i><i class="tooltip"><b>Toggle Wireframe</b><br>Enable/disable wireframe visibility<br>Shortcut: [none]</i></li>
+        <li title="Shadow Catcher" onclick="toggleShadowCatcher(); toggleButton(this)"><i class="material-icons" style="font-size:14px">brightness_6</i><i class="tooltip"><b>Toggle Shadow Catcher</b><br>Enable/disable shadow catcher visibility<br>Shortcut: [none]</i></li>
+        <li title="Scene Grid" onclick="toggleGrid(); toggleButton(this)"><i class="material-icons"  style="font-size:14px">remove</i><i class="tooltip"><b>Toggle Scene Grid</b><br>Enable/disable scene grid visibility<br>Shortcut: [none]</i></li>
     </ul>
     <!-- dynamic -->
     <ul id="color_palette" title="Color Palette"></ul>
-    <div id="loadingscreen"><div class="spinner"><i class="material-icons" style="font-size: 50px; color: orange">motion_photos_on</i></div></div>
+    <div id="loadingscreen"><div class="spinner"><i class="material-icons" style="font-size: 50px; color: orange">settings</i></div></div>
     <div id="notifier"></div>
     <div id="status"><span id="fps" style="font-size: 11px">00</span> | <span id="voxels">0</span><i> voxels</i> <span id="verts">0</span><i> verts</i></div>
+    <div id="help"><div class="tip"><b>Introduction</b><br>Here you will find a short instruction to learn the basics and keyboard shortcuts. Visit <a href="https://github.com/nimadez/voxel-builder">GitHub Repository</a> for more technical information, requests and bug reports.</div></div>
+    <div id="helpbtn"><button><i class="material-icons">live_help</i></button></div>
     <!-- hidden -->
     <div style="display: none" id="show_menuV" onclick="document.getElementById('menuV').style.transform = 'translate(0, 0)'"></div>
     <div style="display: none" id="hide_menuV" onclick="document.getElementById('menuV').style.transform = 'translate(200px, 0)'"></div>
@@ -1117,37 +1131,31 @@
     }
 
     // -----------------------------------------------------------------------------------
-    // Local Storage & Memory ------------------------------------------------------------
+    // Storage & Memory ------------------------------------------------------------------
+
+    let storage = [];
+    let memory = [];
 
     function setStorage() {
-        localStorage.setItem("voxelstorage", JSON.stringify(voxels));
+        storage = voxels.slice(0);
     }
     
     function getStorage() {
-        let data = JSON.parse(localStorage.getItem("voxelstorage"));
-        if (!data) {
+        if (storage.length == 0) {
             showNotification("empty storage");
             return;
         }
+        
         if (!confirm("This operation is not undoable, continue?")) return;
-        let newData = [];
-        for (let i in data) {
-            newData.push({
-                position: new BABYLON.Vector3(data[i].position._x, data[i].position._y, data[i].position._z),
-                color: data[i].color
-            });
-        }
-        createBlock(newData);
+        createBlock(storage);
         clearMemory();
-        data = null;
-        newData = null;
     }
 
     function saveMemory(step) {
         if (step > 9) step = 0;
         if (step < 0) step = 9;
 
-        localStorage.setItem("voxelstorage"+step, JSON.stringify(voxels));
+        memory[step] = voxels.slice(0);
 
         for (let i of memBlocks)
             i.classList.remove("selected");
@@ -1158,18 +1166,8 @@
         if (step > 9) step = 0;
         if (step < 0) step = 9;
 
-        let data = JSON.parse(localStorage.getItem("voxelstorage"+step));
-        if (!data) return;
-        let newData = [];
-        for (let i in data) {
-            newData.push({
-                position: new BABYLON.Vector3(data[i].position._x, data[i].position._y, data[i].position._z),
-                color: data[i].color
-            });
-        }
-        createBlock(newData);
-        data = null;
-        newData = null;
+        if (!memory[step]) return;
+        createBlock(memory[step]);
 
         for (let i of memBlocks)
             i.classList.remove("selected");
@@ -1180,9 +1178,20 @@
     // clear memory and initialize memory block 0
     function clearMemory() {
         memStep = 0;
-        for (let step=0; step<10; step++)
-            localStorage.removeItem("voxelstorage"+step);
+        memory = [];
         saveMemory(0);
+    }
+
+    // switch memory blocks on click
+    for (let i=0; i<memBlocks.length; i++) {
+        memBlocks[i].addEventListener("click", function() {
+            if (memory[i] !== undefined) {  // if storage is not empty
+                for (let b of memBlocks) b.classList.remove("selected"); // unselect all
+                this.classList.add("selected");
+            } else {
+                showNotification("empty memory");
+            }
+        }, false);
     }
 
     // -----------------------------------------------------------------------------------
@@ -1199,26 +1208,6 @@
                 for (let z = -Z; z <= Z; z++) {
                     data.push({ position: new BABYLON.Vector3(x, y, z), color: currentColor });
                 }
-            }
-        }
-        createBlock(data);
-        fitCameraToMesh();
-        clearMemory();
-        data = null;
-    }
-
-    function createRandom() {
-        if (!confirm("Discard current project?")) return;
-        const X = (document.getElementById('user-input-create-x').value - 1) / 2;
-        const min = 0; // Y min, floor
-        const max = document.getElementById('user-input-create-y').value; // Y max
-        const Z = (document.getElementById('user-input-create-z').value - 1) / 2;
-        let data = [];
-        let rng = 0;
-        for (let x = -X; x <= X; x++) {
-            for (let z = -Z; z <= Z; z++) {
-                rng = Math.random() * (max - min) + min;
-                data.push({ position: new BABYLON.Vector3(x, rng, z), color: currentColor });
             }
         }
         createBlock(data);
@@ -1318,20 +1307,23 @@
             case 'd':
                 toolSelector('remove', true);
                 break;
-            case '1':
+            case 'q':
                 toolSelector('paint', false);
                 break;
-            case '2':
+            case 'i':
                 toolSelector('fillcolor', false);
                 break;
-            case '3':
+            case 'e':
                 toolSelector('pickcolor', false);
                 break;
-            case '4':
+            case 'o':
                 toolSelector('hide', false);
                 break;
-            case '5':
+            case 'p':
                 toolSelector('hidecolor', false);
+                break;
+            case 'h':
+                fitCameraToMesh();
                 break;
             case 'f':
                 toggleFullscreen();
@@ -1366,18 +1358,6 @@
             if (e.keyCode == 116) location.reload();
         }
     }, false);
-
-    // switch memory blocks on click
-    for (let i=0; i<memBlocks.length; i++) {
-        memBlocks[i].addEventListener("click", function() {
-            if (localStorage.getItem("voxelstorage"+i)) {  // if storage is not empty
-                for (let b of memBlocks) b.classList.remove("selected"); // unselect all
-                this.classList.add("selected");
-            } else {
-                showNotification("Empty Memory");
-            }
-        }, false);
-    }
 
     // -----------------------------------------------------------------------------------
     // Functions -------------------------------------------------------------------------
@@ -1783,6 +1763,35 @@
             el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
         }
     }
+
+    // -----------------------------------------------------------------------------------
+    // Instruction & Tips ----------------------------------------------------------------
+
+    const help = document.getElementById('help');
+    const helpBtn = document.getElementById('helpbtn');
+    const tooltips = document.getElementsByClassName('tooltip');
+
+    help.addEventListener("click", function() {
+        help.style.bottom = '-200px';
+        helpBtn.style.display = 'unset';
+    });
+
+    helpBtn.addEventListener("click", function() {
+        help.style.bottom = '5px';
+        helpBtn.style.display = 'none';
+    });
+
+    // register all tooltips
+    for (let i=0; i<tooltips.length; i++) {
+        tooltips[i].parentElement.addEventListener("pointerdown", function() { // mobile
+            help.firstChild.innerHTML = tooltips[i].innerHTML;
+        }, false);
+        tooltips[i].parentElement.addEventListener("pointermove", function() { // desktop
+            help.firstChild.innerHTML = tooltips[i].innerHTML;
+        }, false);
+    }
+
+    if (isMobileDevice()) help.click(); // hide to save space in mobile devices
 
     // -----------------------------------------------------------------------------------
     // Startup ---------------------------------------------------------------------------
