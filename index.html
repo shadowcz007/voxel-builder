@@ -42,13 +42,14 @@
     14. Functions               standalone functions
     15. Utilities: babylon      babylon related utils
     16. Utilities: html         html related utils
-    17. Instruction & Tips      show help, instructions, tips
+    17. Help & Tooltips         show help, instructions, tooltips
     18. Startup                 load startup project
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes"> <!-- to launch the page fullscreen when the user has added it to the home screen -->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="description" content="A voxel-based modeling application built using Babylon.js engine, optimized for maximum performance and minimum dependencies">
     <meta name="author" content="@nimadez">
@@ -61,8 +62,8 @@
     <script src="https://cdn.jsdelivr.net/gh/BabylonJS/Babylon.js@master/dist/serializers/babylonjs.serializers.min.js"></script>      <!-- <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script> -->
     <style>
         * { margin: 0; padding: 0; }
-        html, body { overscroll-behavior-y: contain; user-select: none; overflow: hidden; } /* prevent pull-down refresh and text selection on chrome mobile */
-        body { font-family: sans-serif; font-size: 11px; color: #cccccc; cursor: default; }
+        html, body { overscroll-behavior-y: contain; user-select: none; overflow: hidden; touch-action: pan-x; } /* prevent pull-down refresh and text selection on chrome mobile */
+        body { background: black; font-family: sans-serif; font-size: 11px; color: #cccccc; cursor: default; }
         a { color: slategray; text-decoration: none; }
         a:hover { color: orange; text-decoration: none; }
         canvas { z-index: 0; position: absolute; width: 100%; height: 100%; outline: none; background: radial-gradient(circle, rgb(81, 90, 109) 0%, rgb(49, 53, 68) 100%); }
@@ -85,9 +86,9 @@
         label { color: #5c6c81; margin-right: 2px; margin-left: 2px; }
         #menuH_L { background: none; left: 5px; top: 5px; }
         #menuH_L li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #menuH_R { background: none; right: 5px; top: 5px; z-index: 999; }
+        #menuH_R { z-index: 500; background: none; right: 5px; top: 5px; }
         #menuH_R li { display: inline-block; width: 30px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
-        #menuH_C { background: none; width: 300px; left: 50%; margin-left: -150px; top: 8px; z-index: 999; text-align: center; }
+        #menuH_C { z-index: 500; background: none; width: 300px; left: 50%; margin-left: -150px; top: 8px; text-align: center; }
         #menuH_C li { display: inline-block; width: 20px; padding: 1px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #menuH_C li.selected { background-color: orange; color: #222; }
         #menuV { z-index: 1000; position: fixed; top: 0; right: 0; background: #222731f8; padding: 10px; width: 120px; height: 100%; transform: translate(200px, 0); transition: -webkit-transform 0.2s ease; overflow-y: scroll; }
@@ -95,21 +96,21 @@
         #menuV li:hover { background: none; color: orange; }
         #menuV .category { color: #464c5e; background: #1e222b; border: solid 1px #181c22; font-size: 10px; font-weight: bold; text-align: center; margin: 6px 4px 6px 0; padding: 2px; }
         #menuV .category:hover { color: #43495a; background: #1e222b; cursor: default; }
-        #toolbar_R { width: 28px; right: 5px; top: 60px; padding: 3px; border-radius: 5px; }
+        #toolbar_R { z-index: 500; position: absolute; width: 28px; right: 5px; top: 60px; padding: 3px; border-radius: 5px; }
         #toolbar_R li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #toolbar_R li.separator { height: 1px; background: #525861; margin-top: 4px; margin-bottom: 4px; box-shadow: none; }
-        #toolbar_L { width: 28px; left: 5px; top: 60px; padding: 3px; border-radius: 5px; }
+        #toolbar_L { z-index: 500; position: absolute; width: 28px; left: 5px; top: 60px; padding: 3px; border-radius: 5px; }
         #toolbar_L li { margin-bottom: 2px; box-shadow: inset 1px 1px 1px #323b47, inset -1px -1px 1px #29303a; }
         #toolbar_L li.separator { height: 1px; background: #525861; margin-top: 4px; margin-bottom: 4px; box-shadow: none; }
-        #color_palette { left: 5px; top: 225px; padding: 3px; border-radius: 5px; }
+        #color_palette { z-index: 500; position: absolute; left: 5px; top: 252px; padding: 3px; border-radius: 5px; }
         #color_palette li { width: 20px; height: 5px; margin-bottom: 1px; }
         #color_palette li:hover { border: solid 1px orange; }
-        #hover { z-index: 1; background: none; left: 60%; top: 20%; }
+        #hover { z-index: 1; position: absolute; background: none; left: 60%; top: 20%; }
         #hover li { box-shadow: inset 1px 1px 1px #37414e, inset -1px -1px 1px #2f3742; }
         #hover li:nth-child(1) { cursor: move; }
         #hover li:nth-child(2) { position: absolute; top: -110%; left: 0%; }
         #hover li:nth-child(3) { position: absolute; top: 0%; left: 108%; }
-        #hover li:nth-child(4) { position: absolute; top: 0%; left: -110%; }
+        #hover li:nth-child(4) { position: absolute; top: 0%; left: -108%; }
         #hover li:nth-child(5) { position: absolute; top: 108%; left: 0%; }
         #hover select { appearance: none; width: 18px; background-color: #2a313db7; color: #bbb; font-size: 14px; font-weight: bold; padding: 0; border: none; outline: none; }
         #hover select:hover { color: orange; cursor: pointer; }
@@ -121,18 +122,21 @@
         #axisview li:nth-child(3) { position: absolute; top: -18%; right: 83%; }
         #axisview li:nth-child(4) { position: absolute; top: 22%; right: 103%; }
         #axisview li:nth-child(5) { position: absolute; top: 65%; right: 97%; }
-        #loadingscreen { display: none; z-index: 1001; position: absolute; width: 100%; height: 100%; background: #000000bb; }
-        #loadingscreen .spinner { position: absolute; top: 50%; left: 50%; margin-left: -50px; margin-top: -50px; border-radius: 50%; background: #252e38; border: 2px solid #344558; animation: spin 3s infinite linear; }
-        #notifier { opacity: 0; transition: opacity 0.5s; position: absolute; left: 50%; top: 50%; margin-left: -50px; margin-top: -20px; padding: 3px 5px 3px 5px; background: orange; color: #111; border: dashed 1px #d18800; font-size: 10px; font-weight: bold; border-radius: 5px; }
+        #symmetryaxis { z-index: 500; position: absolute; width: 200px; left: 50%; top: 30px; margin-left: -100px; }
+        #symmetryaxis ul { width: 100%; text-align: center; background: none; }
+        #symmetryaxis li { width: 10px; height: 11px; background: none; border: none; font-size: 10px; font-weight: bold; padding: 2px 5px 2px 5px; border-radius: 50%; display: inline-block; }
+        #symmetryaxis li.selected { background: #eeeeee20; }
+        #notifier { opacity: 0; transition: opacity 0.5s; position: absolute; width: fit-content; left: 50%; top: 50%; margin-left: -200px; margin-top: -20px; padding: 3px 5px 3px 5px; background: orange; color: #111; border: dashed 1px #d18800; font-size: 10px; font-weight: bold; text-align: center; border-radius: 5px; }
         #notifier.fade { opacity: 1; }
         #status { color: #ffffff30; position: absolute; bottom: 4px; left: 5px; font-size: 10px; font-weight: bold; opacity: 0.8; }
         #status span { color: #eee; padding: 0 1px 0 1px; }
         #status i { color: #aaa; }
-        #help { background: #21262e; padding: 8px; border-radius: 5px; position: absolute; width: 300px; height: auto; left: 50%; bottom: 5px; margin-left: -160px; transition: 0.5s; overflow: hidden; cursor: help; }
+        #help { z-index: 600; background: #21262e; padding: 8px; border-radius: 5px; position: absolute; width: 300px; height: auto; left: 50%; bottom: 5px; margin-left: -160px; transition: 0.5s; overflow: hidden; cursor: help; }
         #help .tip { color: #bbb; font-size: 12px; line-height: 1.3em; }
         #help .tip b { color: orange; }
         #helpbtn { display: none; color: #b4cadb; width: 20px; height: 20px; text-align: center; text-shadow: 1px 1px #000; position: absolute; left: 50%; bottom: 10px; margin-left: -10px; }
         #helpbtn button { width: 30px; }
+        #babylonjsLoadingDiv { z-index: 2000; } /* injecting babylon.js css */
         .tooltip { display: none; }
         .material-icons { font-size: 18px; pointer-events: none; vertical-align: middle; text-align: center; }
         ::-webkit-scrollbar { display: none; }
@@ -166,10 +170,10 @@
         <li title="New Project"><button onclick="newProject()">New</button><i class="tooltip"><b>New Project</b><br>Reset scene and load a new project<br>Shortcut: [none]</i></li>
         <li title="Load Project"><button onclick="document.getElementById('openfile_vox').click()">Load</button><i class="tooltip"><b>Load Project</b><br>Reset scene and load project from a file<br>Shortcut: [none]</i></li>
         <li title="Save Project"><button onclick="saveProject()">Save</button><i class="tooltip"><b>Save Project</b><br>Save project to file, user-perferences not included<br>Shortcut: [none]</i></li>
-        <li title="Import OBJ"><button onclick="document.getElementById('openfile_obj').click()">Import</button><i class="tooltip"><b>Import OBJ</b><br>Import model, merge and voxelize meshes.<br>Use "Import Scale" to change voxelization quality, higher scale capture more details.<br>Shortcut: [none]</i></li>
+        <li title="Import OBJ"><button onclick="document.getElementById('openfile_obj').click()">Import <span style="color: tomato; font-size: 10px;">[beta]</span></button><i class="tooltip"><b>Import OBJ</b><br>Import model, merge and voxelize meshes.<br>Use "Import Scale" to change voxelization quality, higher scale capture more details.<br>Shortcut: [none]</i></li>
         <li title="Export GLB"><button onclick="exportMesh()">Export</button><i class="tooltip"><b>Export GLB</b><br>Export model to GLB, include colors and grid texture, try Blender to import GLB<br>Shortcut: [none]</i></li>
         <li class="spacer"></li>
-        <li title="Higher scale capture more details"><label>Import Scale &nbsp;<input id="user-input-voxelization-scale" type="number" value="30" min="1" max="100" style="width: 38px"></label></li>
+        <li title="Higher scale capture more details"><label>Import Scale &nbsp;<input id="user-input-voxelization-scale" type="number" value="30" min="1" max="40" style="width: 38px"></label></li>
         <li class="category">HDRI</li>
         <li title="Load Environment"><button onclick="document.getElementById('openfile_hdr').click()">Load</button><i class="tooltip"><b>Load Environment</b><br>Load HDRI map for lighting and background<br>Shortcut: [none]</i></li>
         <li title="Remove Environment"><button onclick="removeHDR()">Remove</button><i class="tooltip"><b>Remove Environment</b><br>Unload and remove HDRI map<br>Shortcut: [none]</i></li>
@@ -177,9 +181,9 @@
         <li title="Show Skybox" onclick="toggleSkybox()"><input type="checkbox" id="check_skybox"><i class="material-icons"></i> Background <i class="tooltip"><b>Show Skybox</b><br>Toggle skybox/background visibility<br>Shortcut: [none]</i></li>
         <li class="category">CREATE</li>
         <li>
-            <label>X&nbsp;&nbsp;</label><input id="user-input-create-x" type="number" value="5" min="1" max="100"><br>
-            <label>Y&nbsp;&nbsp;</label><input id="user-input-create-y" type="number" value="6" min="1" max="100"><br>
-            <label>Z&nbsp;&nbsp;</label><input id="user-input-create-z" type="number" value="5" min="1" max="100"><br>
+            <label>X&nbsp;</label><input id="user-input-create-x" type="number" value="5" min="1" max="40"><label><40</label><br>
+            <label>Y&nbsp;</label><input id="user-input-create-y" type="number" value="6" min="1" max="40"><label><40</label><br>
+            <label>Z&nbsp;</label><input id="user-input-create-z" type="number" value="5" min="1" max="40"><label><40</label><br>
             <li class="spacer"></li>
             <button title="Create Grid or Plane" onclick="createGrid()">Grid / Plane<i class="tooltip"><b>Create Grid</b><br>Create grid or plane, use X/Y/Z to define number of voxels, set Y to 1 to create a plane<br>Shortcut: [none]</i></button>
         </li>
@@ -191,25 +195,26 @@
         <li><label>Light &nbsp;<input title="Light Position" type="number" value="120" min="0" max="360" step="10" oninput="setLightPositionByAngle(scene.lights[1], this.value, 50, 100); updateShadowMap();"> °</label><i class="tooltip"><b>Light Position</b><br>Set light position by angle<br>Shortcut: [none]</i></li>
         <li class="category">SCENE</li>
         <li><button title="Optimize Scene" onclick="optimize()">Optimize Scene</button><i class="tooltip"><b>Optimize Scene</b><br>Optimize scene for maximum performance<br>Shortcut: [none]</i></li>
-        <li><button title="Toggle Debug Tools" onclick="toggleDebugMode()">Debug Mode</button><i class="tooltip"><b>Toggle Debug Tools</b><br>Show/hide Babylon.js debug layer<br>Shortcut: [none]</i></li>
+        <li><button title="Toggle Debug Tools" onclick="toggleDebugMode()">Debug Mode</button><i class="tooltip"><b>Toggle Debug Tools</b><br>Show/hide Babylon.js debug layer, open menu to hide it<br>Shortcut: [none]</i></li>
         <li class="category">ABOUT</li>
         <li style="text-align: center; font-size: 10px;"><a href="https://github.com/nimadez/voxel-builder">Fork me on GitHub</a><br><a href="https://nimadez.github.io/">©2019 nimadez</a></li>
     </ul>
     <ul id="toolbar_L">
-        <li title="Fit Camera [H]" onclick="fitCameraToMesh()"><i class="material-icons">filter_center_focus</i><i class="tooltip"><b>Fit Camera</b><br>Reset camera and fit to model<br>Shortcut [H]</i></li>
+        <li title="Minimal Interface [`]" onclick="toggleMinimalInterface(false)"><i class="material-icons">self_improvement</i><i class="tooltip"><b>Minimal Interface (Zen Mode)</b><br>Toggle minimal interface mode, switch to minimal interface for better mobile experience, click on View Cube to maximize interface.<br>Shortcut [`]</i></li>
+        <li title="Fit Camera [C]" onclick="fitCameraToMesh()"><i class="material-icons">filter_center_focus</i><i class="tooltip"><b>Fit Camera</b><br>Reset camera and fit to model<br>Shortcut [C]</i></li>
         <li class="separator"></li>
         <li title="Paint Color [Q]" class="paint" onclick="toolSelector('paint', false)"><i class="material-icons">brush</i><i class="tooltip"><b>Paint Color</b><br>Paint selected color (undoable)<br>Shortcut: [Q]</i></li>
         <li title="Fill Color [I]" class="fillcolor" onclick="toolSelector('fillcolor', false)"><i class="material-icons">format_paint</i><i class="tooltip"><b>Fill Color</b><br>Fill and replace all similar colors<br>Shortcut: [I]</i></li>
         <li class="separator"></li>
-        <li title="Pick Color [E]" class="pickcolor" onclick="toolSelector('pickcolor', false)"><i class="material-icons">colorize</i><i class="tooltip"><b>Pick Color</b><br>Pick voxel color, color palette created on the fly<br>Shortcut: [E]</i></li>
+        <li title="Pick Color [P]" class="pickcolor" onclick="toolSelector('pickcolor', false)"><i class="material-icons">colorize</i><i class="tooltip"><b>Pick Color</b><br>Pick voxel color, color palette created on the fly<br>Shortcut: [P]</i></li>
         <li title="Color Picker" class="colorpicker" onclick="document.getElementById('inputcolor').click()"><input type="color" id="inputcolor" value="#3876C0"><i class="tooltip"><b>Color Picker</b><br>Pick a color, color palette created on the fly<br>Shortcut: [none]</i></li>
     </ul>
     <ul id="toolbar_R">
-        <li title="Quick Restore" onclick="getStorage()"><i class="material-icons">restore</i><i class="tooltip"><b>Quick Restore</b><br>Restore model from local storage, It is persistent as long as the user chooses to refresh the page.<br>Shortcut [none]</i></li>
-        <li title="Quick Save" onclick="setStorage()"><i class="material-icons">save</i><i class="tooltip"><b>Quick Save</b><br>Save model to local storage, It is persistent as long as the user chooses to refresh the page.<br>Shortcut [none]</i></li>
+        <li title="Quick Restore" onclick="getStorage()"><i class="material-icons">restore</i><i class="tooltip"><b>Quick Restore</b><br>Restore model from local storage, It is persistent as long as the user chooses to clear the browser data.<br>Shortcut [none]</i></li>
+        <li title="Quick Save" onclick="setStorage()"><i class="material-icons">save</i><i class="tooltip"><b>Quick Save</b><br>Save model to local storage, It is persistent as long as the user chooses to clear the browser data.<br>Shortcut [none]</i></li>
         <li class="separator"></li>
-        <li title="Hide Voxels [O]" class="hide" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i><i class="tooltip"><b>Hide Voxels</b><br>Hide selected voxels, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [O]</i></li>
-        <li title="Hide Voxels By Color [P]" class="hidecolor" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i><i class="tooltip"><b>Hide Voxels By Color</b><br>Hide voxels by color, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [P]</i></li>
+        <li title="Hide Voxels [H]" class="hide" onclick="toolSelector('hide', false)"><i class="material-icons">layers_clear</i><i class="tooltip"><b>Hide Voxels</b><br>Hide selected voxels, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [H]</i></li>
+        <li title="Hide Voxels By Color [J]" class="hidecolor" onclick="toolSelector('hidecolor', false)"><i class="material-icons">invert_colors_off</i><i class="tooltip"><b>Hide Voxels By Color</b><br>Hide voxels by color, don't forget to apply "Freeze Visibility", or reset visibility using "Unhide All".<br>Shortcut: [J]</i></li>
         <li title="Unhide All" class="unhideall" onclick="setParticlesVisibility(true)"><i class="material-icons">restart_alt</i><i class="tooltip"><b>Unhide All</b><br>Show all voxels, ignore changes and reset visibility<br>Shortcut: [none]</i></li>
         <li title="Freeze Visibility" class="freezevisibility" onclick="freezeVisibility()"><i class="material-icons">ac_unit</i><i class="tooltip"><b>Freeze Visibility</b><br>Remove all hidden voxels (undoable)<br>Shortcut: [none]</i></li>
         <li class="separator"></li>
@@ -220,26 +225,25 @@
         <li title="Add [W]" class="add" onclick="toolSelector('add', true)"><i class="material-icons">create</i><i class="tooltip"><b>Add</b><br>Add new voxels, support undo and symmetry<br>Shortcut: [W]</i></li>
         <li title="Remove [D]" class="remove" onclick="toolSelector('remove', true)"><i class="material-icons">clear</i><i class="tooltip"><b>Remove</b><br>Remove voxels, support undo and symmetry<br>Shortcut: [D]</i></li>
         <li title="Transform [A]" class="transform" onclick="toolSelector('transform', true)"><i class="material-icons">border_inner</i><i class="tooltip"><b>Transform</b><br>Translate in selected axis, support undo and symmetry<br>Shortcut: [A]</i></li>
-        <li title="Symmetry Draw and Paint" class="symmetry">
-            <select id="inputsymmetry">
-                <option style="color: #444;" value="" selected="selected">&nbsp;S</option>
-                <option style="color: #C83C43;" value="x">&nbsp;X</option>
-                <option style="color: #47C64B;" value="y">&nbsp;Y</option>
-                <option style="color: #6493D2;" value="z">&nbsp;Z</option>
-            </select>
-            <i class="tooltip"><b>Symmetric Draw and Paint</b><br>Select axis to show indicator<br>Support Add, Remove, Transform and Paint Color<br>Shortcut: [none]</i>
-        </li>
     </ul>
-    <ul id="axisview">
+    <ul id="axisview" onclick="toggleMinimalInterface(true)">
         <li title="Grid Texture" onclick="toggleShowGridTexture(); toggleButton(this)"><i class="material-icons" style="font-size:14px">grain</i><i class="tooltip"><b>Toggle Grid Texture</b><br>Enable/disable grid texture visibility<br>Shortcut: [none]</i></li>
         <li title="Bounding Box" onclick="toggleBoundingBox(); toggleButton(this)""><i class="material-icons" style="font-size:14px">select_all</i><i class="tooltip"><b>Toggle Bounding Box</b><br>Enable/disable bounding box visibility<br>Shortcut: [none]</i></li>
         <li title="Wireframe" onclick="toggleShowWireframe(); toggleButton(this)"><i class="material-icons" style="font-size:14px">flip</i><i class="tooltip"><b>Toggle Wireframe</b><br>Enable/disable wireframe visibility<br>Shortcut: [none]</i></li>
         <li title="Shadow Catcher" onclick="toggleShadowCatcher(); toggleButton(this)"><i class="material-icons" style="font-size:14px">brightness_6</i><i class="tooltip"><b>Toggle Shadow Catcher</b><br>Enable/disable shadow catcher visibility<br>Shortcut: [none]</i></li>
         <li title="Scene Grid" onclick="toggleGrid(); toggleButton(this)"><i class="material-icons"  style="font-size:14px">remove</i><i class="tooltip"><b>Toggle Scene Grid</b><br>Enable/disable scene grid visibility<br>Shortcut: [none]</i></li>
     </ul>
+    <div id="symmetryaxis" title="Symmetry Draw and Paint">
+        <ul>
+            <li style="color: #999;" onclick="setSymmetryAxis('', this)" class="selected">N</li>
+            <li style="color: #ee4951;" onclick="setSymmetryAxis('x', this)">X</li>
+            <li style="color: #34c239;" onclick="setSymmetryAxis('y', this)">Y</li>
+            <li style="color: #529dff;" onclick="setSymmetryAxis('z', this)">Z</li>
+        </ul>
+        <i class="tooltip"><b>Symmetric Draw and Paint</b><br>Select axis to show indicator<br>Support Add, Remove, Transform and Paint Color<br>Shortcut: [none]</i>
+    </div>
     <!-- dynamic -->
     <ul id="color_palette" title="Color Palette"></ul>
-    <div id="loadingscreen"><div class="spinner"><i class="material-icons" style="font-size: 50px; color: orange">settings</i></div></div>
     <div id="notifier"></div>
     <div id="status"><span id="fps" style="font-size: 11px">00</span> | <span id="voxels">0</span><i> voxels</i> <span id="verts">0</span><i> verts</i></div>
     <div id="help"><div class="tip"><b>Introduction</b><br>Here you will find a short instruction to learn the basics and keyboard shortcuts. Visit <a href="https://github.com/nimadez/voxel-builder">GitHub Repository</a> for more technical information, requests and bug reports.</div></div>
@@ -256,10 +260,10 @@
     const numFps = document.getElementById('fps');
     const notifier = document.getElementById('notifier');
     const inputColor = document.getElementById('inputcolor');
-    const inputSymmetry = document.getElementById("inputsymmetry");
     const memBlocks = document.querySelectorAll('#menuH_C li');
+    const MAXAMOUNT = 64000;
     let currentColor = inputColor.value.toUpperCase();
-    let symmetryAxis = inputSymmetry.options[inputSymmetry.selectedIndex].value;
+    let symmetryAxis = ''; //'x'
     let showVerticalMenu = true;
     let memStep = 0;
 
@@ -271,6 +275,7 @@
     engine.enableOfflineSupport = false;
     engine.doNotHandleContextLost = true;
     engine.useHighPrecisionFloats = false;
+    engine.loadingUIBackgroundColor = "#000000e1";
 
     const scene = createScene(engine);
     const sceneAxisView = createAxisViewScene(engine);
@@ -297,11 +302,10 @@
 
         const camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 10, BABYLON.Vector3.Zero(), scene);
         camera.attachControl(canvas, true);
-        camera.setPosition(new BABYLON.Vector3(20, 15, 20));
         camera.setTarget(new BABYLON.Vector3(0, 2, 0));
         camera.panningSensibility = 300;
         camera.wheelPrecision = 10;
-        camera.lowerRadiusLimit = 3;
+        camera.lowerRadiusLimit = 5;
         camera.upperRadiusLimit = 200;
         if (isMobileDevice()) camera.pinchPrecision = 100;
 
@@ -317,12 +321,13 @@
         light.diffuse = new BABYLON.Color3(1, 1, 1);
         light.intensity = 1;
 
-        const shadowGen = new BABYLON.ShadowGenerator(512, light); // shadows updated manually on SPS.mesh changes,
+        const shadowGen = new BABYLON.ShadowGenerator(1024, light); // shadows updated manually on SPS.mesh changes,
         shadowGen.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE; // to save performance
         shadowGen.filteringQuality = BABYLON.ShadowGenerator.QUALITY_LOW;
-        shadowGen.useExponentialShadowMap = false;
-        shadowGen.usePercentageCloserFiltering = true;
-        shadowGen.setDarkness(0.6);
+        shadowGen.useExponentialShadowMap = true;
+        shadowGen.usePoissonSampling = true;
+        shadowGen.forceBackFacesOnly = false;
+        shadowGen.setDarkness(0.5);
 
         const grid = BABYLON.MeshBuilder.CreateGround("grid", {width: 20, height: 20}, scene);
         grid.material = new BABYLON.GridMaterial("grid", scene);
@@ -537,7 +542,7 @@
     // -----------------------------------------------------------------------------------
     // Overlays & Helpers ----------------------------------------------------------------
 
-    let dummyVoxels = []; // voxels for visualization only
+    let dummyVoxels = []; // fake voxels for visualization
 
     const overlayCube = BABYLON.MeshBuilder.CreateBox("overlay_cube", {}, scene);
     overlayCube.isVisible = false;
@@ -577,9 +582,9 @@
     const workPlane = BABYLON.MeshBuilder.CreatePlane("workplane", { width: 20, height: 20, sideOrientation: BABYLON.Mesh.DOUBLESIDE }, scene);
     workPlane.isVisible = false;
     workPlane.isPickable = false;
-    workPlane.visibility = 0.03;
+    workPlane.visibility = 0.02;
     workPlane.renderOverlay = true;
-    workPlane.overlayAlpha = 0.03;
+    workPlane.overlayAlpha = 0.02;
     workPlane.overlayColor = new BABYLON.Color3.FromHexString('#ff00ff');
     workPlane.doNotSyncBoundingInfo = true;
     workPlane.convertToUnIndexedMesh();
@@ -645,6 +650,10 @@
     toolSelector('camera', false); // select startup tool
 
     function toolAdd(pos) {
+        if (voxels.length >= MAXAMOUNT) {
+            showNotification('you have reached the max amount! (64000 voxels)');
+            return;
+        }
         for (let i in selected) // no duplicates
             if (selected[i].equals(pos))
                 return;
@@ -654,6 +663,7 @@
     }
 
     function toolAddSymmetry(pos, axis) {
+        if (axis == '') return;
         pos = symmetryInverse(pos, axis);
         for (let i in voxels) // no duplicates
             if (voxels[i].position.equals(pos))
@@ -671,6 +681,7 @@
     }
 
     function toolRemoveSymmetry(pos, axis) {
+        if (axis == '') return;
         toolRemove(symmetryInverse(pos, axis));
     }
 
@@ -684,6 +695,7 @@
     }
 
     function toolTransformSymmetry(posBegin, posEnd, index, axis) {
+        if (axis == '') return;
         index = symmetryFinder(posBegin, axis);
         if (index == -1) return;
         posEnd = symmetryInverse(posEnd, axis);
@@ -702,6 +714,7 @@
     }
 
     function toolPaintSymmetry(index, axis) {
+        if (axis == '') return;
         index = symmetryFinder(voxels[index].position, axis);
         if (index == -1) return;
         toolPaint(index);
@@ -743,14 +756,14 @@
                 setOverlayPlane(pos.add(norm.scale(0.5)), norm, '#00FF00');
                 if (isMouseDown && pauseCameraControls()) {
                     toolAdd(pos.add(norm));
-                    if (symmetryAxis !== '') toolAddSymmetry(pos.add(norm), symmetryAxis);
+                    toolAddSymmetry(pos.add(norm), symmetryAxis);
                 }
                 break;
             case 'remove':
                 setOverlayCube(pos, BABYLON.Vector3.One(), '#FF0000');
                 if (isMouseDown && pauseCameraControls()) {
                     toolRemove(pos);
-                    if (symmetryAxis !== '') toolRemoveSymmetry(pos, symmetryAxis);
+                    toolRemoveSymmetry(pos, symmetryAxis);
                 }
                 break;
             case 'transform':
@@ -758,7 +771,7 @@
                 setOverlayPlane(pos.add(norm.scale(0.5)), norm, '#00FFFF');
                 if (isMouseDown && pauseCameraControls()) {
                     toolTransform(pos, pos.add(norm), index);
-                    if (symmetryAxis !== '') toolTransformSymmetry(pos, pos.add(norm), index, symmetryAxis);
+                    toolTransformSymmetry(pos, pos.add(norm), index, symmetryAxis);
                 }
                 break;
             case 'hide':
@@ -770,7 +783,7 @@
                 setOverlayPlane(pos.add(norm.scale(0.5)), norm, currentColor);
                 if (isMouseDown && pauseCameraControls()) {
                     toolPaint(index);
-                    if (symmetryAxis !== '') toolPaintSymmetry(index, symmetryAxis);
+                    toolPaintSymmetry(index, symmetryAxis);
                 }
                 break;
             case 'pickcolor':
@@ -825,7 +838,7 @@
         clearDummyVoxels();
         selected = [];
 
-        // store memory
+        // store memory if the tool is not excluded
         const ignoredTools = ['hide', 'hidecolor'];
         if (!ignoredTools.includes(tool)) {
             memStep += 1;
@@ -842,9 +855,8 @@
     function symmetryFinder(pos, axis) {
         pos = symmetryInverse(pos, axis);
         for (let i in voxels) {
-            if (voxels[i].position.equals(pos)){
+            if (voxels[i].position.equals(pos))
                 return i; // return voxel index at certain mirrored position
-            }
         }
         return -1;
     }
@@ -995,11 +1007,12 @@
             pipeline.grainEnabled = true;
             pipeline.grain.intensity = 2;
             pipeline.grain.animated = false;
-            //pipeline.depthOfFieldEnabled = false;
-            //pipeline.depthOfFieldBlurLevel = BABYLON.DepthOfFieldEffectBlurLevel.Low;
-            //pipeline.depthOfField.focusDistance = 1000;
-            //pipeline.depthOfField.focalLength = 50;
-            //pipeline.depthOfField.fStop = 1.0;
+            pipeline.depthOfFieldEnabled = false;
+            pipeline.depthOfFieldBlurLevel = BABYLON.DepthOfFieldEffectBlurLevel.Low;
+            pipeline.depthOfField.focusDistance = SPS.mesh.getDistanceToCamera(scene.activeCamera);
+            pipeline.depthOfField.focalLength = 35;
+            pipeline.depthOfField.fStop = 1.4;
+            pipeline.depthOfField.lensSize = 100;
         }
     }
 
@@ -1059,7 +1072,7 @@
 
     function importMesh(url, ext) {
         const scale = document.getElementById('user-input-voxelization-scale').value;
-        toggleLoadingScreen();
+        engine.displayLoadingUI();
         BABYLON.SceneLoader.LoadAssetContainerAsync(url, "", scene, null, ext).then(function(container) {
             const mesh = BABYLON.Mesh.MergeMeshes(container.meshes, true, true);
             normalizeImportedMesh(mesh, scale);
@@ -1071,6 +1084,13 @@
             size.y = size.y / 2;
             size.z = size.z / 2;
             mesh.dispose();
+
+            if (pointData.length >= MAXAMOUNT) {
+                pointData = null;
+                engine.hideLoadingUI();
+                showNotification("unable to import model, data is so big!");
+                return;
+            }
 
             let voxelGrid = [];
             for (let x = -size.x; x <= size.x; x++) {   // create grid of voxels
@@ -1106,16 +1126,17 @@
             unique = null;
             pointData = null;
             voxelGrid = null;
-            toggleLoadingScreen();
+            engine.hideLoadingUI();
 
         }).catch(function(reason) {
-            toggleLoadingScreen();
+            engine.hideLoadingUI();
             showNotification("unable to import model");
             console.error(reason.message);
         });
     }
 
     function exportMesh() {
+        engine.displayLoadingUI();
         let mesh = SPS.mesh.clone();
         mesh.position.y += 0.5;
         const options = {
@@ -1127,28 +1148,41 @@
             glb.downloadFiles();
             mesh.dispose();
             mesh = null;
+            engine.hideLoadingUI();
         });
     }
 
     // -----------------------------------------------------------------------------------
     // Storage & Memory ------------------------------------------------------------------
 
-    let storage = [];
     let memory = [];
 
     function setStorage() {
-        storage = voxels.slice(0);
+        if (voxels.length >= MAXAMOUNT) {
+            showNotification("unable to store model, data is so big!");
+            return;
+        }
+        localStorage.setItem("voxelstorage", JSON.stringify(voxels));
     }
     
     function getStorage() {
-        if (storage.length == 0) {
+        let data = JSON.parse(localStorage.getItem("voxelstorage"));
+        if (!data) {
             showNotification("empty storage");
             return;
         }
-        
         if (!confirm("This operation is not undoable, continue?")) return;
-        createBlock(storage);
+        let newData = [];
+        for (let i in data) {
+            newData.push({
+                position: new BABYLON.Vector3(data[i].position._x, data[i].position._y, data[i].position._z),
+                color: data[i].color
+            });
+        }
+        createBlock(newData);
         clearMemory();
+        data = null;
+        newData = null;
     }
 
     function saveMemory(step) {
@@ -1221,7 +1255,8 @@
 
     window.addEventListener("resize", function () { 
         engine.resize();
-        sceneAxisView.activeCamera.viewport = updateViewport(80, 80, 0, 0);
+        updateAxisViewViewport();
+        toggleMinimalInterface(true);
     }, false);
 
     canvas.addEventListener("pointerdown", handleToolDown, false);
@@ -1273,25 +1308,6 @@
         currentColor = this.value.toUpperCase();
     }, false);
 
-    inputSymmetry.addEventListener("input", function (e) {
-        symmetryAxis = this.options[this.selectedIndex].value;
-        this.style.color = '#bbb';
-        clearWorkPlane();
-        const size = getMeshSize(SPS.mesh.getBoundingInfo());
-        if (symmetryAxis == 'x') {
-            this.style.color = '#C83C43';
-            setWorkPlane(BABYLON.Axis.X, size.x/4);
-        }
-        if (symmetryAxis == 'y') {
-            this.style.color = '#47C64B';
-            setWorkPlane(BABYLON.Axis.Y, size.y/4);
-        }
-        if (symmetryAxis == 'z') {
-            this.style.color = '#6493D2';
-            setWorkPlane(BABYLON.Axis.Z, size.z/4);
-        }
-    }, false);
-
     canvas.addEventListener("keyup", function (e) {
         //console.log(e.key);
         switch (e.key) {
@@ -1313,54 +1329,64 @@
             case 'i':
                 toolSelector('fillcolor', false);
                 break;
-            case 'e':
+            case 'p':
                 toolSelector('pickcolor', false);
                 break;
-            case 'o':
+            case 'h':
                 toolSelector('hide', false);
                 break;
-            case 'p':
+            case 'j':
                 toolSelector('hidecolor', false);
                 break;
-            case 'h':
+            case 'c':
                 fitCameraToMesh();
                 break;
             case 'f':
                 toggleFullscreen();
                 break;
+            case '`':
+                toggleMinimalInterface(false);
+                break;
         }
-        if (e.ctrlKey && e.key === 'z') {
-            let tempStep = memStep - 1;
-            if (tempStep < 0) tempStep = 9;
-            if (localStorage.getItem("voxelstorage"+tempStep)) {
-                memStep -= 1;
-                loadMemory(memStep);
-            }
-        }
-        if (e.ctrlKey && e.key === 'x') {
-            let tempStep = memStep + 1;
-            if (tempStep > 9) tempStep = 0;
-            if (localStorage.getItem("voxelstorage"+tempStep)) {
-                memStep += 1;
-                loadMemory(memStep);
-            }
-        }
+        if (e.ctrlKey && e.key === 'z') loadMemory(memStep - 1);
+        if (e.ctrlKey && e.key === 'x') loadMemory(memStep + 1);
     }, false);
 
     document.addEventListener("keyup", function (e) {
         switch (e.key) {
-            case ' ':
+            case ' ': //space key
                 toggleVerticalMenu();
                 break;
         }
         // F5 refresh for electron
-        if (navigator.userAgent.toLowerCase().indexOf(' electron/') > -1) {
+        if (navigator.userAgent.toLowerCase().indexOf(' electron/') > -1)
             if (e.keyCode == 116) location.reload();
-        }
     }, false);
 
     // -----------------------------------------------------------------------------------
     // Functions -------------------------------------------------------------------------
+
+    function setSymmetryAxis(axis, event) {
+        // clear and re-set buttons
+        for (let i of document.querySelectorAll('#symmetryaxis li'))
+            i.classList.remove("selected");
+        event.classList.add("selected");
+
+        clearWorkPlane();
+        const size = getMeshSize(SPS.mesh.getBoundingInfo());
+        if (axis == '') {
+            symmetryAxis = '';
+        } else if (axis == 'x') {
+            setWorkPlane(BABYLON.Axis.X, size.x/4);
+            symmetryAxis = 'x';
+        } else if (axis == 'y') {
+            setWorkPlane(BABYLON.Axis.Y, size.y/4);
+            symmetryAxis = 'y';
+        } else if (axis == 'z') {
+            setWorkPlane(BABYLON.Axis.Z, size.z/4);
+            symmetryAxis = 'z';
+        }
+    }
 
     function normalizeImportedMesh(mesh, scale) {
         // normalize scale
@@ -1423,7 +1449,7 @@
     function fitCameraToMesh() {
         const bounds = SPS.mesh.getBoundingInfo().boundingSphere;
         const radius = bounds.radiusWorld;
-        scene.activeCamera.setPosition(new BABYLON.Vector3(radius * 4, radius * 4, radius * 4));
+        scene.activeCamera.setPosition(new BABYLON.Vector3(radius * 5, radius * 5, radius * 5));
         scene.activeCamera.setTarget(bounds.center.clone());
     }
 
@@ -1481,6 +1507,20 @@
     // -----------------------------------------------------------------------------------
     // Utilities: babylon ----------------------------------------------------------------
 
+    function updateViewport(w, h, bottom, right) {
+        const width = canvas.width;
+        const height = canvas.height;
+        return new BABYLON.Viewport(1 - (w + right) / width, 1 - (bottom + height) / height,   w / width, h / height);
+    }
+
+    function updateAxisViewViewport() {
+        sceneAxisView.activeCamera.viewport = updateViewport(80, 80, 0, 0);
+    }
+
+    function updateShadowMap() {
+        scene.lights[1].getShadowGenerator().getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+    }
+
     function setLightPositionByAngle(light, angle, distance, height) {
         const x = Math.cos(angle * Math.PI / 180) * distance;
         const y = height;
@@ -1488,16 +1528,6 @@
         const pos = new BABYLON.Vector3(x, y, z);
         light.position = pos; // our primary shadow light
         light.setDirectionToTarget(BABYLON.Vector3.Zero());
-    }
-
-    function updateShadowMap() {
-        scene.lights[1].getShadowGenerator().getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
-    }
-
-    function updateViewport(w, h, bottom, right) {
-        const width = canvas.width;
-        const height = canvas.height;
-        return new BABYLON.Viewport(1 - (w + right) / width, 1 - (bottom + height) / height,   w / width, h / height);
     }
 
     function getMeshSize(bounds) {
@@ -1556,7 +1586,7 @@
     }
 
     function optimize() {
-        toggleLoadingScreen();
+        engine.displayLoadingUI();
         scene.activeCamera.detachControl(canvas);
         engine.clearInternalTexturesCache();
         scene.cleanCachedTextureBuffer();
@@ -1564,11 +1594,11 @@
         BABYLON.SceneOptimizer.OptimizeAsync(scene, BABYLON.SceneOptimizerOptions.LowDegradationAllowed(),
         function() {
             scene.activeCamera.attachControl(canvas, true);
-            toggleLoadingScreen();
+            engine.hideLoadingUI();
             showNotification('optimized');
         }, function() {
             scene.activeCamera.attachControl(canvas, true);
-            toggleLoadingScreen();
+            engine.hideLoadingUI();
             showNotification('optimization failed');
         });
     }
@@ -1579,17 +1609,28 @@
             document.getElementById('toolbar_L').style.display = 'unset';
             document.getElementById('toolbar_R').style.display = 'unset';
             document.getElementById('menuH_L').style.display = 'unset';
+            document.getElementById('menuH_C').style.display = 'unset';
             document.getElementById('axisview').style.display = 'unset';
             document.getElementById('hover').style.display = 'unset';
             document.getElementById('color_palette').style.display = 'unset';
+            document.getElementById('symmetryaxis').style.display = 'unset';
+            document.getElementById('help').style.display = 'unset';
+            document.getElementById('helpbtn').style.display = 'unset';
+            document.getElementById('status').style.display = 'unset';
         } else {
             scene.debugLayer.show();
             document.getElementById('toolbar_L').style.display = 'none';
             document.getElementById('toolbar_R').style.display = 'none';
             document.getElementById('menuH_L').style.display = 'none';
+            document.getElementById('menuH_C').style.display = 'none';
             document.getElementById('axisview').style.display = 'none';
             document.getElementById('hover').style.display = 'none';
             document.getElementById('color_palette').style.display = 'none';
+            document.getElementById('symmetryaxis').style.display = 'none';
+            document.getElementById('help').style.display = 'none';
+            document.getElementById('helpbtn').style.display = 'none';
+            document.getElementById('status').style.display = 'none';
+            toggleVerticalMenu(); // hide menu
         }
     }
 
@@ -1639,11 +1680,12 @@
 
     function showNotification(txt) {
         notifier.innerHTML = txt.toUpperCase();
+        notifier.style.marginLeft = -(notifier.getBoundingClientRect().width/2) + 'px';
         notifier.classList.toggle('fade');
         const t = setTimeout(function() {
             notifier.classList.toggle('fade');
             clearTimeout(t);
-        }, 3000);
+        }, 4000);
     }
 
     function toggleVerticalMenu() {
@@ -1653,11 +1695,6 @@
         } else {
             document.getElementById('show_menuV').click();
         }
-    }
-
-    function toggleLoadingScreen() {
-        const elem = document.getElementById('loadingscreen');
-        elem.style.display = elem.style.display === 'unset' ? 'none' : 'unset';
     }
 
     function clearButtons(li) {
@@ -1685,6 +1722,39 @@
         } else {
             document.body.requestFullscreen();
             document.getElementById('check_fullscreen').checked = true;
+        }
+    }
+
+    let isMinimal = false;
+    function toggleMinimalInterface(forceDisable) {
+        if (isMinimal || forceDisable) {
+            document.getElementById('toolbar_L').style.display = 'unset';
+            document.getElementById('toolbar_R').style.display = 'unset';
+            document.getElementById('menuH_R').style.display = 'unset';
+            document.getElementById('menuH_L').style.display = 'unset';
+            document.getElementById('menuH_C').style.display = 'unset';
+            document.getElementById('color_palette').style.display = 'unset';
+            document.getElementById('symmetryaxis').style.display = 'unset';
+            document.getElementById('help').style.display = 'unset';
+            document.getElementById('helpbtn').style.display = 'unset';
+            document.getElementById('status').style.display = 'unset';
+            for (let i = 0; i < document.querySelectorAll('#axisview li').length; i++) //toggle AxisView childs
+                document.querySelectorAll('#axisview li')[i].style.display = 'unset';
+            isMinimal = false;
+        } else {
+            document.getElementById('toolbar_L').style.display = 'none';
+            document.getElementById('toolbar_R').style.display = 'none';
+            document.getElementById('menuH_R').style.display = 'none';
+            document.getElementById('menuH_L').style.display = 'none';
+            document.getElementById('menuH_C').style.display = 'none';
+            document.getElementById('color_palette').style.display = 'none';
+            document.getElementById('symmetryaxis').style.display = 'none';
+            document.getElementById('help').style.display = 'none';
+            document.getElementById('helpbtn').style.display = 'none';
+            document.getElementById('status').style.display = 'none';
+            for (let i = 0; i < document.querySelectorAll('#axisview li').length; i++)
+                document.querySelectorAll('#axisview li')[i].style.display = 'none';
+            isMinimal = true;
         }
     }
 
@@ -1765,7 +1835,7 @@
     }
 
     // -----------------------------------------------------------------------------------
-    // Instruction & Tips ----------------------------------------------------------------
+    // Help & Tooltips -------------------------------------------------------------------
 
     const help = document.getElementById('help');
     const helpBtn = document.getElementById('helpbtn');
